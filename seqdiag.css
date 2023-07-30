@@ -1,0 +1,186 @@
+body, html {height: 100%;}
+.top-menu {
+  display: block;
+  border: 1px solid black;
+  width: 100%;
+  height: auto;
+  background-color: #4CBF50;
+}
+.button {
+  background-color: #4CBF50; /* Green */
+  border: none;
+  border-left: 1px solid green;
+  color: white;
+  padding: 10px 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  float: left;
+}
+.button:hover {
+  background-color: #3e8e41;
+}
+#load_file.button {
+  border-left: none;
+}
+#save_svg.button {
+  border-right: 1px solid green;
+}
+#load_example.button {
+  float: right;
+}
+#help.button {
+  float: right;
+  /*align-self: flex-end;*/
+}
+#file_banner {
+  background-color: red;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  text-align: center;
+  display: inline-table;
+  margin: 0 auto;
+  width: auto;
+  /*display: inline-block;
+  width: auto;
+  margin-left: 30%;*/
+  padding: 10px 25px;
+}
+
+.main-flex {
+  display: flex;
+  width: 100%;
+}
+.edit-menu {
+  width: 200px;
+  border: 1px solid black;
+  margin: 2px;
+  background-color: #a8a8a8;
+  font-weight: bold;
+}
+.main_pane {
+  height: auto;
+  min-height: 100% !important;
+  flex: 1;
+  border: 1px solid black;
+  margin: 2px;
+  background-color:  #efefef;
+  font-weight: bold;
+}
+/*
+.edit-btn-group button {
+  background-color: #666666;
+  border: 1px #cccccc;
+  color: white;
+  padding: 5px 15px;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  text-align: left;
+}
+.edit-btn-group .object-btn, .edit-btn-group .message-btn{
+  background-color: #888888;
+}
+.object-btn.hide, .message-btn.hide{
+  display: none;
+}
+.edit-btn-group button:not(:last-child) {
+  border-bottom: none;
+}
+
+.edit-btn-group button:hover {
+  background-color: #333333;
+}*/
+
+.dialogHeader {
+  background-color: #333;
+  color: #fff;
+  padding: 8px;
+  cursor: move;
+}
+.dialogContent {
+  background-color: #fff;
+  padding: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.dialog {
+  width:350px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 120px;
+  top: 100px;
+  border: 1px solid black;
+  /*opacity: 0;
+  pointer-events: none;*/
+  visibility: hidden;
+}
+.dialogContent label {
+  display: inline-block;
+  width: 140px;
+  text-align: right;
+}
+.dialog.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+table {
+  display: inline-table;
+  width: 50%;
+  margin-left:auto;
+  margin-right:auto;
+}
+table, th, td {
+  /*border-collapse: collapse;*/
+}
+.actBars {
+  background-color: #cccccc;
+  display: flex;
+}
+#newActivityBar {
+  background-color: #aaaaaa;
+  display: flex;
+}
+#syncResponse {
+  display: none;
+}
+details summary {
+  background-color: #888888;
+  cursor: pointer;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+details summary > * {
+  display: inline;
+}
+.edit-menu {
+  background-color: #555555;
+  display: inline-block;
+}
+.edit-menu label {
+  background-color: #a8a8a8;
+    font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  width: 50%;
+  border: none;
+  outline: none;
+}
+.edit-menu input {
+  width: 6ch;
+}
+.edit-menu select {
+  background-color: #a8a8a8;
+  color: white;
+  width: 100%;
+  border: none;
+  outline: none;
+}
+option {
+  background-color: #a8a8a8;
+  color: white;
+}

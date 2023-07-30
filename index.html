@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Essential Sequence Diagram Tool</title>
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="seqdiag.css">
+    <script src="seqdiag.js"></script>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div class="top-menu">
+      <button id="load_file" class="button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
+      <button id="save_uml" class="button">Save File</button>
+      <button id="save_svg" class="button">Export SVG</button>
+      <span id="file_banner">something</span>
+      <button id="load_example" class="button">Load Example</button>
+      <button id="help" class="button">Help</button>
+    </div>
+
+    <div class="main-flex">
+      <div class="edit-menu" id="edit-menu">
+        <label for="maxT">Height, t-Axis</label>
+        <input id="maxT" type="number" min="1" max="50"/>
+        <br/>
+        <details>
+          <summary>Objects</summary>
+          <select name="objects" id="objects" size="2">
+            <optgroup label="Create" id="newObjectGroup">
+              <option value="new">new object</option>
+            </optgroup>
+          </select>
+        </details>
+      </div>
+      <div class="main_pane" id="svg_parent">
+      <!--svg goes here-->
+      </div>
+    </div>
+
+    <!--dialogs-->
+<div id="objectDialog" class="dialog">
+  <div id="objectDialogHeader" class="dialogHeader">Edit Object</div>
+  <div id="objectDialogContent" class="dialogContent">
+    <input  id="objectIdx" value="new">
+    <p>
+      <label for="objectName">Object Name:</label>
+      <input type="text" id="objectName" placeholder="new object"/>
+    </p>
+    <p>
+      <label for="objectType">Object Type:</label>
+        <select name="objectType" id="objectType">
+          <option value="object">Simple Object</option>
+          <option value="actor">Actor</option>
+          <option value="-">Other</option>
+        </select>
+    </p>
+    <div class="actBars">
+      <label>Activity Bars:</label>
+      <table id="activityBars">
+        <thead>
+          <tr><td>begin t</td><td>end t</td><td></td></tr>
+        </thead>
+        <tbody id="activityBarsRows">
+        </tbody>
+      </table>
+    </div>
+    <div class="actBars">
+      <label></label>
+      <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar">+</button></td></tr></table>
+    </div>
+    <p>
+    <menu>
+      <button id="cancelObjectDialogBtn" value="cancel">Cancel</button>
+      <button id="applyObjectDialogBtn" value="default">Apply</button>
+      <button id="okObjectDialogBtn" value="default">OK</button>
+      <button id="deleteObjectDialogBtn" style="float: right;" value="default" hidden>Delete</button>
+    </menu>
+    </p>
+  </div>
+</div>
+
+<div id="messageDialog" class="dialog">
+  <div id="messageDialogHeader" class="dialogHeader">Edit Message</div>
+  <div id="messageDialogContent" class="dialogContent">
+    </p>
+      <label for="fromObject">from:</label>
+      <input id="fromObject" type="number" min="1" style="width: 5ch;"/>
+    </p>
+    <p>
+      <label for="toObject">to:</label>
+      <input id="toObject" type="number" min="1" style="width: 5ch;"/>
+    </p>
+    <p>
+      <label for="messageName">Message Text:</label>
+      <input type="text" id="messageName" placeholder="message text"/>
+    </p>
+    <p>
+      <label for="tValue">Message t:</label>
+      <input id="tValue" type="number" min="1" style="width: 5ch;"/>
+    </p>
+    <p>
+      <label for="messageType">Message Type:</label>
+      <select name="messageType" id="messageType">
+        <option value="asynchronous" selected="selected">Asynchronous</option>
+        <option value="synchronous">Synchronous</option>
+        <option value="-">Other</option>
+      </select>
+    </p>
+    <div id="syncResponse">
+      <p>
+        <label for="responseText">Response Text:</label>
+        <input type="text" id="responseText" placeholder="response text"/>
+      </p>
+      <p>
+        <label for="rtValue">Response t:</label>
+        <input id="rtValue" type="number" min="2" style="width: 5ch;"/>
+      </p>
+    </div>
+    <p>
+    <menu>
+      <button id="cancelMessageDialogBtn" value="cancel">Cancel</button>
+      <button id="applyMessageDialogBtn" value="default">Apply</button>
+      <button id="okMessageDialogBtn" value="default">OK</button>
+    </menu>
+    </p>
+  </div>
+</div>
+</body>
+</html>
