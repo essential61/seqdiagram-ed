@@ -1,11 +1,30 @@
-body, html {height: 100%;}
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
 .top-menu {
-  display: block;
-  border: 1px solid black;
+  display: flex;
   width: 100%;
   height: auto;
   background-color: #4CBF50;
 }
+.top-middle {
+  flex: 1;
+  text-align: center;
+  color: white;
+  padding: 10px 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  background-color: #78c878;
+}
+
+.top-right {
+  margin-left: auto;
+}
+
 .button {
   background-color: #4CBF50; /* Green */
   border: none;
@@ -29,27 +48,6 @@ body, html {height: 100%;}
 #save_svg.button {
   border-right: 1px solid green;
 }
-#load_example.button {
-  float: right;
-}
-#help.button {
-  float: right;
-  /*align-self: flex-end;*/
-}
-#file_banner {
-  background-color: red;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  text-align: center;
-  display: inline-table;
-  margin: 0 auto;
-  width: auto;
-  /*display: inline-block;
-  width: auto;
-  margin-left: 30%;*/
-  padding: 10px 25px;
-}
 
 .main-flex {
   display: flex;
@@ -57,44 +55,16 @@ body, html {height: 100%;}
 }
 .edit-menu {
   width: 200px;
-  border: 1px solid black;
-  margin: 2px;
   background-color: #a8a8a8;
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
 .main_pane {
   height: auto;
   min-height: 100% !important;
   flex: 1;
-  border: 1px solid black;
-  margin: 2px;
   background-color:  #efefef;
-  font-weight: bold;
+  border: solid 1px grey;
 }
-/*
-.edit-btn-group button {
-  background-color: #666666;
-  border: 1px #cccccc;
-  color: white;
-  padding: 5px 15px;
-  cursor: pointer;
-  width: 100%;
-  display: block;
-  text-align: left;
-}
-.edit-btn-group .object-btn, .edit-btn-group .message-btn{
-  background-color: #888888;
-}
-.object-btn.hide, .message-btn.hide{
-  display: none;
-}
-.edit-btn-group button:not(:last-child) {
-  border-bottom: none;
-}
-
-.edit-btn-group button:hover {
-  background-color: #333333;
-}*/
 
 .dialogHeader {
   background-color: #333;
@@ -130,24 +100,27 @@ body, html {height: 100%;}
 }
 table {
   display: inline-table;
-  width: 50%;
-  margin-left:auto;
-  margin-right:auto;
+  border-collapse: collapse;
 }
-table, th, td {
-  /*border-collapse: collapse;*/
-}
-.actBars {
+/*#activityBars th, #activityBars td {
+  border: solid 1px;
+}*/
+#existingActBars {
   background-color: #cccccc;
-  display: flex;
 }
-#newActivityBar {
+
+#newActBar {
   background-color: #aaaaaa;
-  display: flex;
 }
+
 #syncResponse {
   display: none;
 }
+
+.delBar {
+  width: 3ch;
+}
+
 details summary {
   background-color: #888888;
   cursor: pointer;

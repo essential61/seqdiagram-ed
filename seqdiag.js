@@ -1,6 +1,6 @@
 // Globals
 //let theSourceDoc;
-let theSourceDoc = { content: '', fileName: '', isModified: false };
+let theSourceDoc = { dom: '', fileName: '', isModified: false };
 
 let xslSVG;
   fetch('./svg.xsl')
@@ -30,7 +30,7 @@ function loadEmptyDocument() {
     <messagelist/>
 </sequencediagml>`;
     const parser = new DOMParser();
-    theSourceDoc.content = parser.parseFromString(theEmptyTxt, "application/xml");
+    theSourceDoc.dom = parser.parseFromString(theEmptyTxt, "application/xml");
 }
 
 function loadFileDocument() {
@@ -41,7 +41,7 @@ function loadFileDocument() {
     reader.onload = function(event) {
         const contents = event.target.result;
         const parser = new DOMParser();
-        theSourceDoc.content = parser.parseFromString(contents, "application/xml");
+        theSourceDoc.dom = parser.parseFromString(contents, "application/xml");
         theSourceDoc.isModified = false;
         theSourceDoc.fileName = file.name;
         populateUi();
@@ -82,22 +82,27 @@ function loadExampleDocument() {
         </object>
     </objectlist>
     <messagelist>
-        <message/>
+        <message type="asynchronous" from="1" to="2" t="3">
+          <messagetext>a message</messagetext>
+        </message>
     </messagelist>
 </sequencediagml>`;
     const parser = new DOMParser();
-    theSourceDoc.content = parser.parseFromString(theExampleTxt, "application/xml");
+    theSourceDoc.dom = parser.parseFromString(theExampleTxt, "application/xml");
     theSourceDoc.isModified = false;
     theSourceDoc.fileName = 'example.uml';
     populateUi();
 }
 
 function populateUi() {
-    // theSourceDoc.content and xslSVG are application globals
-    const theSvgDoc = performTransform(theSourceDoc.content, xslSVG);
+    // theSourceDoc.dom and xslSVG are application globals
+    const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
     const theSvgParent=document.getElementById('svg_parent');
     theSvgParent.innerHTML = '';
     theSvgParent.appendChild(theSvgDoc.documentElement);
+
+    const maxT = document.getElementById('maxT');
+    maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
 
     const theObjectList = document.getElementById('objects');
     // clear existing objects from select before re-populating
@@ -105,22 +110,52 @@ function populateUi() {
     if (existingObjects != null) {
       theObjectList.removeChild(existingObjects);
     }
-    let optGroup = document.createElement('optgroup');
-    optGroup.setAttribute('label', 'Edit or Delete');
-    optGroup.setAttribute('id', 'existingObjectGroup');
-    const objectNodes = theSourceDoc.content.getElementsByTagName("object");
+    let optObjectGroup = document.createElement('optgroup');
+    optObjectGroup.setAttribute('label', 'Edit or Delete');
+    optObjectGroup.setAttribute('id', 'existingObjectGroup');
+    // clear object lists from message dialog
+    const fromList = document.getElementById('fromObject');
+    fromList.innerHTML = '';
+    const toList = document.getElementById('toObject');
+    toList.innerHTML = '';
+    const objectNodes = theSourceDoc.dom.getElementsByTagName("object");
     if (objectNodes.length) {
+
       for (i = 0; i <objectNodes.length; i++) {
         const option = document.createElement("option");
         option.innerHTML = (i + 1).toString() + ". " + objectNodes[i].textContent;
         option.value = i;
-        optGroup.appendChild(option);
+        optObjectGroup.appendChild(option);
+        // populate message dialog "from" and "to" lists
+        fromList.appendChild(option.cloneNode(true));
+        toList.appendChild(option.cloneNode(true));
       }
-      theObjectList.appendChild(optGroup);
+      theObjectList.appendChild(optObjectGroup);
       theObjectList.size = objectNodes.length + 3;
     }
+
+    const theMessageList = document.getElementById('messages');
+    // clear existing objects from select before re-populating
+    const existingMessages = document.getElementById('existingMessageGroup');
+    if (existingMessages != null) {
+      theMessageList.removeChild(existingMessages);
+    }
+    let optMessageGroup = document.createElement('optgroup');
+    optMessageGroup.setAttribute('label', 'Edit or Delete');
+    optMessageGroup.setAttribute('id', 'existingMessageGroup');
+    const messageNodes = theSourceDoc.dom.getElementsByTagName("message");
+    if (messageNodes.length) {
+      for (i = 0; i < messageNodes.length; i++) {
+        const option = document.createElement("option");
+        option.innerHTML = (i + 1).toString() + ". " + messageNodes[i].textContent;
+        option.value = i;
+        optMessageGroup.appendChild(option);
+      }
+      theMessageList.appendChild(optMessageGroup);
+      theMessageList.size = messageNodes.length + 3;
+    }
     //const s = new XMLSerializer();
-    //const str = s.serializeToString(theSourceDoc.content);
+    //const str = s.serializeToString(theSourceDoc.dom);
     //console.log(str);
 }
 
@@ -132,24 +167,25 @@ function performTransform(myDoc, myTransform) {
 }
 
 function saveUmlDocument() {
-    if (theSourceDoc.content != null) {
+    if (theSourceDoc.dom != null) {
       const s = new XMLSerializer();
-      const content = s.serializeToString(theSourceDoc.content);
+      const content = s.serializeToString(theSourceDoc.dom);
       //console.log(content);
-      saveDocument(content);
+      saveDocument(content, theSourceDoc.fileName);
     }
 }
 
 function saveSvgDocument() {
-    if (theSourceDoc.content != null) {
-      const theSvgDoc = performTransform(theSourceDoc.content, xslSVG);
+    if (theSourceDoc.dom != null) {
+      const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
       const s = new XMLSerializer();
-      const content = s.serializeToString(theSourceDoc.content);
-      saveDocument(content);
+      const contentSvg = s.serializeToString(theSvgDoc);
+      console.log(theSourceDoc.fileName.replace(/\..*/g, '.svg'));
+      saveDocument(contentSvg, theSourceDoc.fileName.replace(/\..*/g, '.svg'));
     }
 }
 
-function saveDocument(content) {
+function saveDocument(content, fileName2Use) {
     // Create element with <a> tag
     const link = document.createElement("a");
     // Create a blob object with the file content which you want to add to the file
@@ -157,7 +193,7 @@ function saveDocument(content) {
     // Add file content in the object URL
     link.href = URL.createObjectURL(file);
     // Add file name
-    link.download = theSourceDoc.fileName;
+    link.download = fileName2Use;
     // Add click event to <a> tag to save file.
     link.click();
     URL.revokeObjectURL(link.href);
@@ -185,10 +221,11 @@ function resetObjectDialog() {
   document.getElementById('ebar').value = '';
   document.getElementById('bbar').value = '';
   document.getElementById('deleteObjectDialogBtn').setAttribute('hidden', 'hidden');
+  disableApplyObjectDialog();
 }
 
 function populateObjectDialog(objectIdx) {
-  const objectData = theSourceDoc.content.getElementsByTagName("object")[objectIdx];
+  const objectData = theSourceDoc.dom.getElementsByTagName("object")[objectIdx];
 //  const s = new XMLSerializer();
 //  const content = s.serializeToString(objectData);
 //  console.log(content);
@@ -204,24 +241,75 @@ function populateObjectDialog(objectIdx) {
   for (i = 0; i < barData.length; i++) {
     const barRowId = 'barRow_' + i;
     const delBtnId = 'delBtnRow_' + i;;
-    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-</button></td></tr>');
+    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
     document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
   }
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
   document.getElementById('deleteObjectDialogBtn').removeAttribute('hidden');
+  disableApplyObjectDialog();
 }
 
 function hideObjectDialog() {
   document.getElementById('objectDialog').style.visibility = 'hidden';
 }
 
-function showMessageDialog() {
+function enableApplyObjectDialog() {
+  // could do cross-field validations here
+  document.getElementById('applyObjectDialogBtn').disabled = false;
+}
+
+function disableApplyObjectDialog() {
+  document.getElementById('applyObjectDialogBtn').disabled = true;
+}
+
+function showMessageDialog(event) {
+  const messageIndex = event.target.value
+  if (isNaN(parseInt(messageIndex))) {
+    resetMessageDialog();
+  } else {
+    populateMessageDialog(messageIndex);
+  }
   document.getElementById('messageDialog').style.visibility = 'visible';
+}
+function resetMessageDialog() {
+  document.getElementById('messageIdx').value = 'new';
+  document.getElementById('messageText').value = '';
+  document.getElementById('tValue').value = '';
+  document.getElementById('deleteMessageDialogBtn').setAttribute('hidden', 'hidden');
+  disableApplyMessageDialog();
+}
+
+function populateMessageDialog(messageIdx) {
+  const messageData = theSourceDoc.dom.getElementsByTagName("message")[messageIdx];
+//  const s = new XMLSerializer();
+//  const content = s.serializeToString(objectData);
+//  console.log(content);
+  document.getElementById('messageIdx').value = messageIdx;
+  // TO DO check for out of bounds on select boxes
+  document.getElementById('fromObject').selectedIndex = messageData.getAttribute('from');
+  document.getElementById('toObject').selectedIndex = messageData.getAttribute('to');
+  document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].childNodes[0].nodeValue;
+  document.getElementById('tValue').value = messageData.getAttribute('t');
+  document.getElementById('messageType').value = messageData.getAttribute('type');
+  if (messageData.getAttribute('type') == 'synchronous') {
+    document.getElementById('rtValue').value = messageData.getElementsByTagName('response')[0].childNodes[0].nodeValue;;
+  }
+  document.getElementById('deleteMessageDialogBtn').removeAttribute('hidden');
+  disableApplyMessageDialog();
 }
 
 function hideMessageDialog() {
   document.getElementById('messageDialog').style.visibility = 'hidden';
+}
+
+function enableApplyMessageDialog() {
+  // could do cross-field validations here
+  document.getElementById('applyMessageDialogBtn').disabled = false;
+}
+
+function disableApplyMessageDialog() {
+  document.getElementById('applyMessageDialogBtn').disabled = true;
 }
 
 function startDragging(event) {
@@ -268,15 +356,19 @@ function addActivityBar(event) {
     const delBtnId = 'delBtnRow_' + j;
     const actBarTableBody =  document.getElementById('activityBars').getElementsByTagName('tbody')[0];
     actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + bbar.value + '</td><td>' + ebar.value + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + j + '">-</button></td></tr>');
-    document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
+    const theDelBtn = document.getElementById(delBtnId);
+    theDelBtn.addEventListener("click", removeActivityBar, false);
+    theDelBtn.style.width = '3ch';
     sbar.value = "";
     ebar.value = "";
+    enableApplyObjectDialog();
   }
 }
 
 function removeActivityBar(event) {
     const barId = 'barRow_' + event.target.value;
     document.getElementById(barId).remove();
+    enableApplyObjectDialog();
 }
 
 function toggleResponseVisibility(event) {
@@ -286,6 +378,7 @@ function toggleResponseVisibility(event) {
   } else {
     document.getElementById('syncResponse').style.display = "none";
   }
+  enableApplyMessageDialog();
 }
 
 function updateObject() {
@@ -322,7 +415,7 @@ function updateObject() {
   //const content = s.serializeToString(newElement);
   //console.log(content);
   const objectIdx = document.getElementById('objectIdx');
-  const objectList = theSourceDoc.content.getElementsByTagName("objectlist")[0];
+  const objectList = theSourceDoc.dom.getElementsByTagName("objectlist")[0];
   if (isNaN(parseInt(objectIdx.value))) {
     // append if new.
     objectList.appendChild(newElement);
@@ -335,16 +428,19 @@ function updateObject() {
   }
   theSourceDoc.isModified = true;
   populateUi();
+  disableApplyObjectDialog();
 }
 
 function okObject() {
-  updateObject();
+  if (document.getElementById('applyObjectDialogBtn').disabled == false) {
+    updateObject();
+  }
   hideObjectDialog();
 }
 
 function deleteObject () {
   const objectIdx = document.getElementById('objectIdx');
-  const objectList = theSourceDoc.content.getElementsByTagName('objectlist')[0];
+  const objectList = theSourceDoc.dom.getElementsByTagName('objectlist')[0];
   const object2BRemoved = objectList.getElementsByTagName('object')[objectIdx.value];
   objectList.removeChild(object2BRemoved);
   theSourceDoc.isModified = true;
@@ -352,9 +448,76 @@ function deleteObject () {
   hideObjectDialog();
 }
 
+function updateMessage() {
+  let xmlDoc = document.implementation.createDocument("", "", null);
+  let newElement = xmlDoc.createElement('message');
+  const typeAttr = document.getElementById('messageType').value;
+  const fromAttr = document.getElementById('fromObject').value;
+  const toAttr = document.getElementById('toObject').value;
+  const tAttr = document.getElementById('tValue').value;
+  newElement.setAttribute('type',typeAttr);
+  newElement.setAttribute('from',fromAttr);
+  newElement.setAttribute('to',toAttr);
+  newElement.setAttribute('t',tAttr);
+  let newMessageText = xmlDoc.createElement('messagetext');
+  const messageText = document.getElementById('messageText').value;
+  const newMessageTextTextNode = xmlDoc.createTextNode(messageText);
+  newMessageText.appendChild(newMessageTextTextNode);
+  newElement.appendChild(newMessageText);
+  if (typeAttr == 'synchronous') {
+    let newResponse = xmlDoc.createElement('response');
+    const tResponseAttr = document.getElementById('rtValue').value;
+    newResponse.setAttribute('t', tResponseAttr);
+    const responseText = document.getElementById('responseText').value;
+    const newResponseTextNode = xmlDoc.createTextNode(responseText);
+    newReponse.appendChild(newResponseTextNode);
+    newElement.appendChild(newResponse);
+  }
+  let messageIdx = document.getElementById('messageIdx');
+
+  const messageList = theSourceDoc.dom.getElementsByTagName("messagelist")[0];
+  messages = messageList.getElementsByTagName('message')
+  if (!(isNaN(parseInt(messageIdx.value)))) {
+    const message2BRemoved = messageList.getElementsByTagName('message')[message.Idx.value];
+    messageList.removeChild(message2BRemoved);
+  }
+  let inserted = false;
+  for (i = 0; i < messages.length; i++) {
+    if (parseInt(tAttr) < parseInt(messages[i].getAttribute('t'))) {
+      messageList.insertBefore(newElement, messages[i]);
+      messageIdx.value = i;
+      inserted = true;
+      break;
+    }
+  }
+  if (inserted == false) {
+    messageIdx.value = messages.length;
+    messageList.appendChild(newElement);
+  }
+  theSourceDoc.isModified = true;
+  populateUi();
+}
+
+
+function okMessage() {
+  if (document.getElementById('applyMessageDialogBtn').disabled == false) {
+    updateMessage();
+  }
+  hideMessageDialog();
+}
+
+function deleteMessage () {
+  const messageIdx = document.getElementById('messageIdx');
+  const messageList = theSourceDoc.dom.getElementsByTagName('messagelist')[0];
+  const message2BRemoved = messageList.getElementsByTagName('message')[messageIdx.value];
+  messageList.removeChild(message2BRemoved);
+  theSourceDoc.isModified = true;
+  populateUi();
+  hideMessageDialog();
+}
+
 function updateMaxT(event) {
-  console.log(event.target.value);
-  const max_t = theSourceDoc.content.getElementsByTagName('max_t')[0]
+  const max_t = theSourceDoc.dom.getElementsByTagName('max_t')[0]
   max_t.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
   populateUi();
@@ -384,10 +547,7 @@ function sortDocument(doc2BSorted) {
   const theXslSort = parser.parseFromString(theSortXslString, 'application/xml');
   const xsltProcessor = new XSLTProcessor();
   xsltProcessor.importStylesheet(theXslSort);
-  const sorted = xsltProcessor.transformToDocument(doc2BSorted);
-  const s = new XMLSerializer();
-  const str = s.serializeToString(sorted);
-  console.log(str);
+  return xsltProcessor.transformToDocument(doc2BSorted);
 }
 // Add handlers
 document.onreadystatechange = () => {
@@ -411,6 +571,11 @@ document.onreadystatechange = () => {
     const objectDialogHeader = document.getElementById('objectDialogHeader');
     objectDialogHeader.addEventListener('mousedown', startDragging);
     document.addEventListener('mouseup', stopDragging);
+
+    const objectName = document.getElementById('objectName');
+    objectName.addEventListener('change', enableApplyObjectDialog);
+    const objectType = document.getElementById('objectType');
+    objectType.addEventListener('change', enableApplyObjectDialog);
     const hideDialog = document.getElementById('cancelObjectDialogBtn');
     hideDialog.addEventListener('click', hideObjectDialog);
     const applyDialog = document.getElementById('applyObjectDialogBtn');
@@ -425,12 +590,35 @@ document.onreadystatechange = () => {
 
     const messageDialogHeader = document.getElementById('messageDialogHeader');
     messageDialogHeader.addEventListener('mousedown', startDragging);
-    //const openMessageDialog = document.getElementById('openMessageDialog');
-    //openMessageDialog.addEventListener('click', showMessageDialog);
+    const messages = document.getElementById('messages');
+    messages.addEventListener('click', showMessageDialog);
+
+    const messageFrom = document.getElementById('fromObject');
+    messageFrom.addEventListener('change', enableApplyMessageDialog);
+    const messageTo = document.getElementById('toObject');
+    messageTo.addEventListener('change', enableApplyMessageDialog);
+
+    const messageText = document.getElementById('messageText');
+    messageText.addEventListener('change', enableApplyMessageDialog);
+    const messageT = document.getElementById('tValue');
+    messageT.addEventListener('change', enableApplyMessageDialog);
+
+    const messageResponse = document.getElementById('responseText');
+    messageResponse.addEventListener('change', enableApplyMessageDialog);
+    const rtValue = document.getElementById('rtValue');
+    rtValue.addEventListener('change', enableApplyMessageDialog);
+
     const hideMsgDialog = document.getElementById('cancelMessageDialogBtn');
     hideMsgDialog.addEventListener('click', hideMessageDialog);
     const messageType = document.getElementById('messageType');
     messageType.addEventListener('change', toggleResponseVisibility);
+
+    const applyMDialog = document.getElementById('applyMessageDialogBtn');
+    applyMDialog.addEventListener('click', updateMessage);
+    const okMDialog = document.getElementById('okMessageDialogBtn');
+    okMDialog.addEventListener('click', okMessage);
+    const deleteMDialog = document.getElementById('deleteMessageDialogBtn');
+    deleteMDialog.addEventListener('click', deleteMessage);
 
     window.addEventListener("beforeunload", check4Changes);
 

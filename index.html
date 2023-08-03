@@ -9,24 +9,42 @@
   </head>
   <body>
     <div class="top-menu">
-      <button id="load_file" class="button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
-      <button id="save_uml" class="button">Save File</button>
-      <button id="save_svg" class="button">Export SVG</button>
-      <span id="file_banner">something</span>
-      <button id="load_example" class="button">Load Example</button>
-      <button id="help" class="button">Help</button>
+      <div class="top-left">
+        <button id="load_file" class="button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
+        <button id="save_uml" class="button">Save File</button>
+        <button id="save_svg" class="button">Export SVG</button>
+      </div>
+      <div class="top-middle">
+        <span id="file_banner">something</span>
+      </div>
+      <div class="top-right">
+        <button id="load_example" class="button">Load Example</button>
+        <button id="help" class="button">Help</button>
+      </div>
     </div>
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
+        <p>
         <label for="maxT">Height, t-Axis</label>
         <input id="maxT" type="number" min="1" max="50"/>
-        <br/>
+        <p/>
+        <p>
         <details>
           <summary>Objects</summary>
           <select name="objects" id="objects" size="2">
             <optgroup label="Create" id="newObjectGroup">
               <option value="new">new object</option>
+            </optgroup>
+          </select>
+        </details>
+        </p>
+        <p>
+        <details>
+          <summary>Messages</summary>
+          <select name="messages" id="messages" size="2">
+            <optgroup label="Create" id="newMessageGroup">
+              <option value="new">new message</option>
             </optgroup>
           </select>
         </details>
@@ -53,24 +71,24 @@
           <option value="-">Other</option>
         </select>
     </p>
-    <div class="actBars">
+    <div id="existingActBars">
       <label>Activity Bars:</label>
       <table id="activityBars">
         <thead>
-          <tr><td>begin t</td><td>end t</td><td></td></tr>
+          <tr><td style="width: 8ch;">begin t</td><td style="width: 8ch;">end t</td><td></td></tr>
         </thead>
         <tbody id="activityBarsRows">
         </tbody>
       </table>
     </div>
-    <div class="actBars">
-      <label></label>
-      <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar">+</button></td></tr></table>
+    <div id="newActBar">
+      <label>new bar:</label>
+      <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar" style="width: 3ch;">+</button></td></tr></table>
     </div>
     <p>
     <menu>
       <button id="cancelObjectDialogBtn" value="cancel">Cancel</button>
-      <button id="applyObjectDialogBtn" value="default">Apply</button>
+      <button id="applyObjectDialogBtn" value="default" disabled>Apply</button>
       <button id="okObjectDialogBtn" value="default">OK</button>
       <button id="deleteObjectDialogBtn" style="float: right;" value="default" hidden>Delete</button>
     </menu>
@@ -81,17 +99,20 @@
 <div id="messageDialog" class="dialog">
   <div id="messageDialogHeader" class="dialogHeader">Edit Message</div>
   <div id="messageDialogContent" class="dialogContent">
+    <input  id="messageIdx" value="new">
     </p>
       <label for="fromObject">from:</label>
-      <input id="fromObject" type="number" min="1" style="width: 5ch;"/>
+      <select name="fromObject" id="fromObject">
+      </select>
     </p>
     <p>
       <label for="toObject">to:</label>
-      <input id="toObject" type="number" min="1" style="width: 5ch;"/>
+      <select name="toObject" id="toObject">
+      </select>
     </p>
     <p>
-      <label for="messageName">Message Text:</label>
-      <input type="text" id="messageName" placeholder="message text"/>
+      <label for="messageText">Message Text:</label>
+      <input type="text" id="messageText" placeholder="message text"/>
     </p>
     <p>
       <label for="tValue">Message t:</label>
@@ -120,6 +141,7 @@
       <button id="cancelMessageDialogBtn" value="cancel">Cancel</button>
       <button id="applyMessageDialogBtn" value="default">Apply</button>
       <button id="okMessageDialogBtn" value="default">OK</button>
+      <button id="deleteMessageDialogBtn" style="float: right;" value="default" hidden>Delete</button>
     </menu>
     </p>
   </div>
