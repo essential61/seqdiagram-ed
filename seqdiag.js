@@ -1,5 +1,5 @@
 // Globals
-//let theSourceDoc;
+
 let theSourceDoc = { dom: '', fileName: '', isModified: false };
 
 let xslSVG;
@@ -85,6 +85,10 @@ function loadExampleDocument() {
         <message type="asynchronous" from="1" to="2" t="3">
           <messagetext>a message</messagetext>
         </message>
+        <message type="synchronous" from="2" to="3" t="5">
+          <messagetext>mess</messagetext>
+          <response t="7">blah</response>
+        </message>
     </messagelist>
 </sequencediagml>`;
     const parser = new DOMParser();
@@ -115,15 +119,17 @@ function populateUi() {
     optObjectGroup.setAttribute('id', 'existingObjectGroup');
     // clear object lists from message dialog
     const fromList = document.getElementById('fromObject');
+    const fromSelectedOld = fromList.selectedIndex;
     fromList.innerHTML = '';
     const toList = document.getElementById('toObject');
+    const toSelectedOld = toList.selectedIndex;
     toList.innerHTML = '';
     const objectNodes = theSourceDoc.dom.getElementsByTagName("object");
     if (objectNodes.length) {
 
       for (i = 0; i <objectNodes.length; i++) {
         const option = document.createElement("option");
-        option.innerHTML = (i + 1).toString() + ". " + objectNodes[i].textContent;
+        option.innerHTML = (i + 1).toString() + ". " + objectNodes[i].getElementsByTagName("objectname")[0].textContent;
         option.value = i;
         optObjectGroup.appendChild(option);
         // populate message dialog "from" and "to" lists
@@ -132,6 +138,8 @@ function populateUi() {
       }
       theObjectList.appendChild(optObjectGroup);
       theObjectList.size = objectNodes.length + 3;
+      fromList.selectedIndex = fromSelectedOld;
+      toList.selectedIndex = toSelectedOld;
     }
 
     const theMessageList = document.getElementById('messages');
@@ -147,16 +155,19 @@ function populateUi() {
     if (messageNodes.length) {
       for (i = 0; i < messageNodes.length; i++) {
         const option = document.createElement("option");
-        option.innerHTML = (i + 1).toString() + ". " + messageNodes[i].textContent;
+        option.innerHTML = (i + 1).toString() + ". " + messageNodes[i].getElementsByTagName("messagetext")[0].textContent;
         option.value = i;
         optMessageGroup.appendChild(option);
       }
       theMessageList.appendChild(optMessageGroup);
       theMessageList.size = messageNodes.length + 3;
     }
-    //const s = new XMLSerializer();
-    //const str = s.serializeToString(theSourceDoc.dom);
-    //console.log(str);
+
+    const fileBanner = document.getElementById('file_banner');
+    fileBanner.innerText = theSourceDoc.fileName;
+    if (theSourceDoc.isModified) {
+      fileBanner.innerText += '*';
+    }
 }
 
 function performTransform(myDoc, myTransform) {
@@ -172,6 +183,9 @@ function saveUmlDocument() {
       const content = s.serializeToString(theSourceDoc.dom);
       //console.log(content);
       saveDocument(content, theSourceDoc.fileName);
+      theSourceDoc.isModified = false;
+      const fileBanner = document.getElementById('file_banner');
+      fileBanner.innerText = theSourceDoc.fileName;
     }
 }
 
@@ -264,6 +278,11 @@ function disableApplyObjectDialog() {
 }
 
 function showMessageDialog(event) {
+  document.getElementById('showSyncResponse').style.display = "none";
+  document.getElementById('syncResponse').style.display = "none";
+  document.getElementById('showResponse').checked = false;
+  document.getElementById('responseText').value = '';
+  document.getElementById('rtValue').value = '';
   const messageIndex = event.target.value
   if (isNaN(parseInt(messageIndex))) {
     resetMessageDialog();
@@ -272,11 +291,15 @@ function showMessageDialog(event) {
   }
   document.getElementById('messageDialog').style.visibility = 'visible';
 }
+
 function resetMessageDialog() {
   document.getElementById('messageIdx').value = 'new';
   document.getElementById('messageText').value = '';
   document.getElementById('tValue').value = '';
   document.getElementById('deleteMessageDialogBtn').setAttribute('hidden', 'hidden');
+  document.getElementById('fromObject').selectedIndex = -1;
+  document.getElementById('toObject').selectedIndex = -1;
+  document.getElementById('messageType').selectedIndex = -1;
   disableApplyMessageDialog();
 }
 
@@ -286,14 +309,20 @@ function populateMessageDialog(messageIdx) {
 //  const content = s.serializeToString(objectData);
 //  console.log(content);
   document.getElementById('messageIdx').value = messageIdx;
-  // TO DO check for out of bounds on select boxes
   document.getElementById('fromObject').selectedIndex = messageData.getAttribute('from');
   document.getElementById('toObject').selectedIndex = messageData.getAttribute('to');
   document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].childNodes[0].nodeValue;
   document.getElementById('tValue').value = messageData.getAttribute('t');
   document.getElementById('messageType').value = messageData.getAttribute('type');
   if (messageData.getAttribute('type') == 'synchronous') {
-    document.getElementById('rtValue').value = messageData.getElementsByTagName('response')[0].childNodes[0].nodeValue;;
+    document.getElementById('showSyncResponse').style.display = "inline-block";
+    if (messageData.getElementsByTagName('response').length) {
+      document.getElementById('showResponse').checked = true;
+      document.getElementById('syncResponse').style.display = "inline-block";
+      const responseTag = messageData.getElementsByTagName('response')[0];
+      document.getElementById('responseText').value = responseTag.childNodes[0].nodeValue;
+      document.getElementById('rtValue').value = responseTag.getAttribute('t');
+    }
   }
   document.getElementById('deleteMessageDialogBtn').removeAttribute('hidden');
   disableApplyMessageDialog();
@@ -371,8 +400,19 @@ function removeActivityBar(event) {
     enableApplyObjectDialog();
 }
 
-function toggleResponseVisibility(event) {
+
+function toggleShowResponseVisibility(event) {
   if(event.currentTarget.value == "synchronous")
+  {
+    document.getElementById('showSyncResponse').style.display = "inline-block";
+  } else {
+    document.getElementById('showSyncResponse').style.display = "none";
+  }
+  enableApplyMessageDialog();
+}
+
+function toggleResponseVisibility(event) {
+  if(event.currentTarget.checked == true)
   {
     document.getElementById('syncResponse').style.display = "inline-block";
   } else {
@@ -464,13 +504,13 @@ function updateMessage() {
   const newMessageTextTextNode = xmlDoc.createTextNode(messageText);
   newMessageText.appendChild(newMessageTextTextNode);
   newElement.appendChild(newMessageText);
-  if (typeAttr == 'synchronous') {
+  if (typeAttr == 'synchronous' && document.getElementById('showResponse').checked == true) {
     let newResponse = xmlDoc.createElement('response');
     const tResponseAttr = document.getElementById('rtValue').value;
     newResponse.setAttribute('t', tResponseAttr);
     const responseText = document.getElementById('responseText').value;
     const newResponseTextNode = xmlDoc.createTextNode(responseText);
-    newReponse.appendChild(newResponseTextNode);
+    newResponse.appendChild(newResponseTextNode);
     newElement.appendChild(newResponse);
   }
   let messageIdx = document.getElementById('messageIdx');
@@ -478,7 +518,7 @@ function updateMessage() {
   const messageList = theSourceDoc.dom.getElementsByTagName("messagelist")[0];
   messages = messageList.getElementsByTagName('message')
   if (!(isNaN(parseInt(messageIdx.value)))) {
-    const message2BRemoved = messageList.getElementsByTagName('message')[message.Idx.value];
+    const message2BRemoved = messages[messageIdx.value];
     messageList.removeChild(message2BRemoved);
   }
   let inserted = false;
@@ -611,7 +651,9 @@ document.onreadystatechange = () => {
     const hideMsgDialog = document.getElementById('cancelMessageDialogBtn');
     hideMsgDialog.addEventListener('click', hideMessageDialog);
     const messageType = document.getElementById('messageType');
-    messageType.addEventListener('change', toggleResponseVisibility);
+    messageType.addEventListener('change', toggleShowResponseVisibility);
+    const showResponse = document.getElementById('showResponse');
+    showResponse.addEventListener('click', toggleResponseVisibility);
 
     const applyMDialog = document.getElementById('applyMessageDialogBtn');
     applyMDialog.addEventListener('click', updateMessage);

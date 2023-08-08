@@ -121,11 +121,15 @@
     <p>
       <label for="messageType">Message Type:</label>
       <select name="messageType" id="messageType">
-        <option value="asynchronous" selected="selected">Asynchronous</option>
+        <option value="asynchronous" selected>Asynchronous</option>
         <option value="synchronous">Synchronous</option>
         <option value="-">Other</option>
       </select>
     </p>
+    <div id="showSyncResponse">
+      <label for="showResponse">Show Response:</label>
+      <input type="checkbox" id="showResponse" name="showResponse"/>
+    </div>
     <div id="syncResponse">
       <p>
         <label for="responseText">Response Text:</label>

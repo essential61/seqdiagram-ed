@@ -113,6 +113,10 @@ table {
   background-color: #aaaaaa;
 }
 
+#showSyncResponse {
+  display: none;
+}
+
 #syncResponse {
   display: none;
 }
