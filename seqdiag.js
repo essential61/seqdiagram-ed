@@ -105,6 +105,18 @@ function populateUi() {
     theSvgParent.innerHTML = '';
     theSvgParent.appendChild(theSvgDoc.documentElement);
 
+    // re-apply any highlighted svg elements
+    const objectIndex = document.getElementById('objectIdx');
+    if (document.getElementById('objectDialog').style.visibility == 'visible' && !(isNaN(parseInt(objectIndex.value)))) {
+      const objectSvg = document.getElementById('object_' + objectIndex.value);
+      objectSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    }
+    const messageIndex = document.getElementById('messageIdx')
+    if (document.getElementById('messageDialog').style.visibility == 'visible' && !(isNaN(parseInt(messageIndex.value)))) {
+      const messageSvg = document.getElementById('message_' + messageIndex.value);
+      messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    }
+
     const maxT = document.getElementById('maxT');
     maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
 
@@ -129,12 +141,15 @@ function populateUi() {
 
       for (i = 0; i <objectNodes.length; i++) {
         const option = document.createElement("option");
-        option.innerHTML = (i + 1).toString() + ". " + objectNodes[i].getElementsByTagName("objectname")[0].textContent;
+        option.innerHTML = (i + 1).toString() + ". " + (objectNodes[i].getElementsByTagName("objectname")[0].textContent).substring(0, 15);
         option.value = i;
         optObjectGroup.appendChild(option);
         // populate message dialog "from" and "to" lists
         fromList.appendChild(option.cloneNode(true));
         toList.appendChild(option.cloneNode(true));
+        // add click handler to svg object
+        const objectSvg = document.getElementById('object_' + i);
+        objectSvg.addEventListener('click', showObjectDialogSvg);
       }
       theObjectList.appendChild(optObjectGroup);
       theObjectList.size = objectNodes.length + 3;
@@ -158,6 +173,8 @@ function populateUi() {
         option.innerHTML = (i + 1).toString() + ". " + messageNodes[i].getElementsByTagName("messagetext")[0].textContent;
         option.value = i;
         optMessageGroup.appendChild(option);
+        const messageSvg = document.getElementById('message_' + i);
+        messageSvg.addEventListener('click', showMessageDialogSvg);
       }
       theMessageList.appendChild(optMessageGroup);
       theMessageList.size = messageNodes.length + 3;
@@ -179,23 +196,31 @@ function performTransform(myDoc, myTransform) {
 
 function saveUmlDocument() {
     if (theSourceDoc.dom != null) {
-      const s = new XMLSerializer();
-      const content = s.serializeToString(theSourceDoc.dom);
-      //console.log(content);
-      saveDocument(content, theSourceDoc.fileName);
-      theSourceDoc.isModified = false;
-      const fileBanner = document.getElementById('file_banner');
-      fileBanner.innerText = theSourceDoc.fileName;
+      let filename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName);
+      if (filename) {
+        if (filename != theSourceDoc.fileName) {
+          theSourceDoc.fileName = filename;
+        }
+        const s = new XMLSerializer();
+        const content = s.serializeToString(theSourceDoc.dom);
+        //console.log(content);
+        saveDocument(content, theSourceDoc.fileName);
+        theSourceDoc.isModified = false;
+        const fileBanner = document.getElementById('file_banner');
+        fileBanner.innerText = theSourceDoc.fileName;
+      }
     }
 }
 
 function saveSvgDocument() {
     if (theSourceDoc.dom != null) {
-      const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
-      const s = new XMLSerializer();
-      const contentSvg = s.serializeToString(theSvgDoc);
-      console.log(theSourceDoc.fileName.replace(/\..*/g, '.svg'));
-      saveDocument(contentSvg, theSourceDoc.fileName.replace(/\..*/g, '.svg'));
+      let svgFilename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName.replace(/\..*/g, '.svg'))
+      if (svgFilename) {
+        const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
+        const s = new XMLSerializer();
+        const contentSvg = s.serializeToString(theSvgDoc);
+        saveDocument(contentSvg, svgFilename);
+      }
     }
 }
 
@@ -213,13 +238,23 @@ function saveDocument(content, fileName2Use) {
     URL.revokeObjectURL(link.href);
 }
 ///////////////////////////
+function showObjectDialogSvg(event) {
+  const objectIndex = event.target.parentElement.id.split('_')[1];
+  showObjectDialog(objectIndex);
+}
 
-function showObjectDialog(event) {
-  const objectIndex = event.target.value
+function showObjectDialogSelect(event) {
+  showObjectDialog(event.target.value);
+}
+
+function showObjectDialog(objectIndex) {
+  hideObjectDialog();
   if (isNaN(parseInt(objectIndex))) {
     resetObjectDialog();
   } else {
     populateObjectDialog(objectIndex);
+    const objectSvg = document.getElementById('object_' + objectIndex);
+    objectSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
   }
   document.getElementById('objectDialog').style.visibility = 'visible';
 }
@@ -266,6 +301,11 @@ function populateObjectDialog(objectIdx) {
 
 function hideObjectDialog() {
   document.getElementById('objectDialog').style.visibility = 'hidden';
+  const objectIndex = document.getElementById('objectIdx');
+  if (!(isNaN(parseInt(objectIndex.value)))) {
+    const objectSvg = document.getElementById('object_' + objectIndex.value);
+    objectSvg.removeAttribute('filter');
+  }
 }
 
 function enableApplyObjectDialog() {
@@ -277,17 +317,27 @@ function disableApplyObjectDialog() {
   document.getElementById('applyObjectDialogBtn').disabled = true;
 }
 
-function showMessageDialog(event) {
+function showMessageDialogSvg (event) {
+  const messageIndex = event.target.parentElement.id.split('_')[1];
+  showMessageDialog(messageIndex);
+}
+function showMessageDialogSelect (event) {
+  showMessageDialog(event.target.value);
+}
+
+function showMessageDialog(messageIndex) {
+  hideMessageDialog();
   document.getElementById('showSyncResponse').style.display = "none";
   document.getElementById('syncResponse').style.display = "none";
   document.getElementById('showResponse').checked = false;
   document.getElementById('responseText').value = '';
   document.getElementById('rtValue').value = '';
-  const messageIndex = event.target.value
   if (isNaN(parseInt(messageIndex))) {
     resetMessageDialog();
   } else {
     populateMessageDialog(messageIndex);
+    const messageSvg = document.getElementById('message_' + messageIndex);
+    messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
   }
   document.getElementById('messageDialog').style.visibility = 'visible';
 }
@@ -330,6 +380,11 @@ function populateMessageDialog(messageIdx) {
 
 function hideMessageDialog() {
   document.getElementById('messageDialog').style.visibility = 'hidden';
+  const messageIndex = document.getElementById('messageIdx');
+  if (!(isNaN(parseInt(messageIndex.value)))) {
+    const messageSvg = document.getElementById('message_' + messageIndex.value);
+    messageSvg.removeAttribute('filter');
+  }
 }
 
 function enableApplyMessageDialog() {
@@ -601,17 +656,15 @@ document.onreadystatechange = () => {
     saveUmlElement.addEventListener("click", saveUmlDocument, false);
     const saveSvgElement = document.getElementById("save_svg");
     saveSvgElement.addEventListener("click", saveSvgDocument, false);
+    document.addEventListener('mouseup', stopDragging);
 
     const maxT = document.getElementById('maxT');
     maxT.addEventListener('change', updateMaxT);
 
     const objects = document.getElementById('objects');
-    objects.addEventListener('click', showObjectDialog);
-
+    objects.addEventListener('click', showObjectDialogSelect);
     const objectDialogHeader = document.getElementById('objectDialogHeader');
     objectDialogHeader.addEventListener('mousedown', startDragging);
-    document.addEventListener('mouseup', stopDragging);
-
     const objectName = document.getElementById('objectName');
     objectName.addEventListener('change', enableApplyObjectDialog);
     const objectType = document.getElementById('objectType');
@@ -624,37 +677,31 @@ document.onreadystatechange = () => {
     okDialog.addEventListener('click', okObject);
     const deleteDialog = document.getElementById('deleteObjectDialogBtn');
     deleteDialog.addEventListener('click', deleteObject);
-
     const newActivityBar = document.getElementById('addBar');
     newActivityBar.addEventListener("click", addActivityBar, false);
 
+    const messages = document.getElementById('messages');
+    messages.addEventListener('click', showMessageDialogSelect);
     const messageDialogHeader = document.getElementById('messageDialogHeader');
     messageDialogHeader.addEventListener('mousedown', startDragging);
-    const messages = document.getElementById('messages');
-    messages.addEventListener('click', showMessageDialog);
-
     const messageFrom = document.getElementById('fromObject');
     messageFrom.addEventListener('change', enableApplyMessageDialog);
     const messageTo = document.getElementById('toObject');
     messageTo.addEventListener('change', enableApplyMessageDialog);
-
     const messageText = document.getElementById('messageText');
     messageText.addEventListener('change', enableApplyMessageDialog);
     const messageT = document.getElementById('tValue');
     messageT.addEventListener('change', enableApplyMessageDialog);
-
     const messageResponse = document.getElementById('responseText');
     messageResponse.addEventListener('change', enableApplyMessageDialog);
     const rtValue = document.getElementById('rtValue');
     rtValue.addEventListener('change', enableApplyMessageDialog);
-
     const hideMsgDialog = document.getElementById('cancelMessageDialogBtn');
     hideMsgDialog.addEventListener('click', hideMessageDialog);
     const messageType = document.getElementById('messageType');
     messageType.addEventListener('change', toggleShowResponseVisibility);
     const showResponse = document.getElementById('showResponse');
     showResponse.addEventListener('click', toggleResponseVisibility);
-
     const applyMDialog = document.getElementById('applyMessageDialogBtn');
     applyMDialog.addEventListener('click', updateMessage);
     const okMDialog = document.getElementById('okMessageDialogBtn');
