@@ -3,20 +3,23 @@
 let theSourceDoc = { dom: '', fileName: '', isModified: false };
 
 let xslSVG;
-  fetch('./svg.xsl')
-    .then(response => {
-      if (response.ok) {
-        return response.text()
-      } else {
-        return Promise.reject('error: ' + response.status)
-      }
-    })
-    .then(data => {
-      const parser = new DOMParser();
-      xslSVG = parser.parseFromString(data, 'application/xml');
-      //console.log(xslSVG);
-    })
-    .catch(error => console.error(error));
+
+fetch('./svg.xsl')
+  .then(response => {
+    if (response.ok) {
+      return response.text()
+    } else {
+      return Promise.reject('error: ' + response.status)
+    }
+  })
+  .then(data => {
+    const parser = new DOMParser();
+    // assign to the global variable xslSVG above
+    xslSVG = parser.parseFromString(data, 'application/xml');
+    //console.log(xslSVG);
+    loadEmptyDocument();
+  })
+  .catch(error => console.error(error));
 
 // Functions
 function loadEmptyDocument() {
@@ -31,12 +34,18 @@ function loadEmptyDocument() {
 </sequencediagml>`;
     const parser = new DOMParser();
     theSourceDoc.dom = parser.parseFromString(theEmptyTxt, "application/xml");
+    const xsltProcessor = new XSLTProcessor();
+    xsltProcessor.importStylesheet(xslSVG);
+    const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
+    const theSvgParent=document.getElementById('svg_parent');
+    theSvgParent.innerHTML = '';
+    theSvgParent.appendChild(theSvgDoc.documentElement);
 }
 
 function loadFileDocument() {
     const fileList = this.files;
     const file = fileList[0];
-    console.log(file.name);
+    //console.log(file.name);
     const reader = new FileReader();
     reader.onload = function(event) {
         const contents = event.target.result;
@@ -100,7 +109,9 @@ function loadExampleDocument() {
 
 function populateUi() {
     // theSourceDoc.dom and xslSVG are application globals
-    const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
+    const xsltProcessor = new XSLTProcessor();
+    xsltProcessor.importStylesheet(xslSVG);
+    const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
     const theSvgParent=document.getElementById('svg_parent');
     theSvgParent.innerHTML = '';
     theSvgParent.appendChild(theSvgDoc.documentElement);
@@ -279,7 +290,7 @@ function populateObjectDialog(objectIdx) {
 //  const content = s.serializeToString(objectData);
 //  console.log(content);
   document.getElementById('objectIdx').value = objectIdx;
-  document.getElementById('objectName').value = objectData.getElementsByTagName('objectname')[0].childNodes[0].nodeValue;
+  document.getElementById('objectName').value = objectData.getElementsByTagName('objectname')[0].textContent;
   document.getElementById('objectType').value = objectData.getAttribute('type');
   let barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
@@ -360,8 +371,12 @@ function populateMessageDialog(messageIdx) {
 //  console.log(content);
   document.getElementById('messageIdx').value = messageIdx;
   document.getElementById('fromObject').selectedIndex = messageData.getAttribute('from');
-  document.getElementById('toObject').selectedIndex = messageData.getAttribute('to');
-  document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].childNodes[0].nodeValue;
+  if (messageData.getAttribute('type') == 'reflexive') {
+    document.getElementById('toObject').style.display = "none";
+  } else {
+    document.getElementById('toObject').selectedIndex = messageData.getAttribute('to');
+  }
+  document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].textContent;
   document.getElementById('tValue').value = messageData.getAttribute('t');
   document.getElementById('messageType').value = messageData.getAttribute('type');
   if (messageData.getAttribute('type') == 'synchronous') {
@@ -370,7 +385,7 @@ function populateMessageDialog(messageIdx) {
       document.getElementById('showResponse').checked = true;
       document.getElementById('syncResponse').style.display = "inline-block";
       const responseTag = messageData.getElementsByTagName('response')[0];
-      document.getElementById('responseText').value = responseTag.childNodes[0].nodeValue;
+      document.getElementById('responseText').value = responseTag.textContent;
       document.getElementById('rtValue').value = responseTag.getAttribute('t');
     }
   }
@@ -456,12 +471,23 @@ function removeActivityBar(event) {
 }
 
 
-function toggleShowResponseVisibility(event) {
-  if(event.currentTarget.value == "synchronous")
-  {
-    document.getElementById('showSyncResponse').style.display = "inline-block";
-  } else {
-    document.getElementById('showSyncResponse').style.display = "none";
+function messageTypeTailorDialog(event) {
+  const messageType = event.currentTarget.value;
+  switch (messageType) {
+    case "synchronous":
+      document.getElementById('showSyncResponse').checked == false
+      document.getElementById('showSyncResponse').style.display = "inline-block";
+      document.getElementById('toObject').style.display = "inline-block";
+      break;
+    case "reflexive":
+      document.getElementById('showSyncResponse').style.display = "none";
+      document.getElementById('syncResponse').style.display = "none";
+      document.getElementById('toObject').style.display = "none";
+      break;
+    default:
+      document.getElementById('showSyncResponse').style.display = "none";
+      document.getElementById('syncResponse').style.display = "none";
+      document.getElementById('toObject').style.display = "inline-block";
   }
   enableApplyMessageDialog();
 }
@@ -548,11 +574,13 @@ function updateMessage() {
   let newElement = xmlDoc.createElement('message');
   const typeAttr = document.getElementById('messageType').value;
   const fromAttr = document.getElementById('fromObject').value;
-  const toAttr = document.getElementById('toObject').value;
   const tAttr = document.getElementById('tValue').value;
   newElement.setAttribute('type',typeAttr);
   newElement.setAttribute('from',fromAttr);
-  newElement.setAttribute('to',toAttr);
+  if (!(typeAttr == 'reflexive')) {
+    const toAttr = document.getElementById('toObject').value;
+    newElement.setAttribute('to',toAttr);
+  }
   newElement.setAttribute('t',tAttr);
   let newMessageText = xmlDoc.createElement('messagetext');
   const messageText = document.getElementById('messageText').value;
@@ -699,7 +727,7 @@ document.onreadystatechange = () => {
     const hideMsgDialog = document.getElementById('cancelMessageDialogBtn');
     hideMsgDialog.addEventListener('click', hideMessageDialog);
     const messageType = document.getElementById('messageType');
-    messageType.addEventListener('change', toggleShowResponseVisibility);
+    messageType.addEventListener('change', messageTypeTailorDialog);
     const showResponse = document.getElementById('showResponse');
     showResponse.addEventListener('click', toggleResponseVisibility);
     const applyMDialog = document.getElementById('applyMessageDialogBtn');
@@ -711,6 +739,6 @@ document.onreadystatechange = () => {
 
     window.addEventListener("beforeunload", check4Changes);
 
-    loadEmptyDocument();
+    //loadEmptyDocument();
   }
 };
