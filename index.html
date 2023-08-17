@@ -10,31 +10,38 @@
   <body>
     <div class="top-menu">
       <div class="top-left">
-        <button id="load_file" class="button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
-        <button id="save_uml" class="button">Save File</button>
-        <button id="save_svg" class="button">Export SVG</button>
+        <button id="load_file" class="top-button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
+        <button id="save_uml" class="top-button">Save File</button>
+        <button id="save_svg" class="top-button">Export SVG</button>
       </div>
       <div class="top-middle">
-        <span id="file_banner">something</span>
+        <span id="file_banner">untitled.uml</span>
       </div>
       <div class="top-right">
-        <button id="load_example" class="button">Load Example</button>
-        <button id="help" class="button">Help</button>
+        <button id="load_example" class="top-button">Load Example</button>
+        <button id="help" class="top-button">Help</button>
       </div>
     </div>
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
+        <div>
+          <label for="showTAxis">Show t-Axis:</label>
+          <input type="checkbox" id="showTAxis" name="showTAxis"/>
+        </div>
         <p>
-        <label for="maxT">Max. t</label>
-        <input id="maxT" type="number" min="1" max="50"/>
+          <button id="toggleScaleButton" class="menu-button">Show t Axis</button>
+        <p/>
+        <p>
+          <label for="maxT">Max. t</label>
+          <input id="maxT" type="number" min="1" max="50"/>
         <p/>
         <p>
         <details>
-          <summary>Objects</summary>
-          <select name="objects" id="objects" size="2">
-            <optgroup label="Create" id="newObjectGroup">
-              <option value="new">new object</option>
+          <summary>Lifelines</summary>
+          <select name="lifelines" id="lifelines" size="2">
+            <optgroup label="Create" id="newLifelineGroup">
+              <option value="new">new lifeline</option>
             </optgroup>
           </select>
         </details>
@@ -55,17 +62,17 @@
     </div>
 
     <!--dialogs-->
-<div id="objectDialog" class="dialog">
-  <div id="objectDialogHeader" class="dialogHeader">Edit Object</div>
-  <div id="objectDialogContent" class="dialogContent">
-    <input  id="objectIdx" value="new">
+<div id="lifelineDialog" class="dialog">
+  <div id="lifelineDialogHeader" class="dialogHeader">Edit Lifeline</div>
+  <div id="lifelineDialogContent" class="dialogContent">
+    <input  id="lifelineIdx" value="new">
     <p>
-      <label for="objectName">Object Name:</label>
-      <textarea id="objectName" placeholder="max 2 lines displayed" rows="2"></textarea>
+      <label for="lifelineName">Lifeline Name:</label>
+      <textarea id="lifelineName" placeholder="max 2 lines displayed" rows="2"></textarea>
     </p>
     <p>
-      <label for="objectType">Object Type:</label>
-        <select name="objectType" id="objectType">
+      <label for="lifelineType">Lifeline Type:</label>
+        <select name="lifelineType" id="lifelineType">
           <option value="object">Simple Object</option>
           <option value="actor">Actor</option>
           <option value="-">Other</option>
@@ -86,11 +93,19 @@
       <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar" style="width: 3ch;">+</button></td></tr></table>
     </div>
     <p>
+    <p>
+      <label for="showFiniteLufeline">Finite lifeline?</label>
+      <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
+    </p>
+    <div id="finiteLifeline">
+      <label for="destroyT">Finish t:</label>
+      <input id="destroyT" type="number" min="2" style="width: 5ch;"/>
+    </div>
     <menu>
-      <button id="cancelObjectDialogBtn" value="cancel">Cancel</button>
-      <button id="applyObjectDialogBtn" value="default" disabled>Apply</button>
-      <button id="okObjectDialogBtn" value="default">OK</button>
-      <button id="deleteObjectDialogBtn" style="float: right;" value="default" hidden>Delete</button>
+      <button id="cancelLifelineDialogBtn" value="cancel">Cancel</button>
+      <button id="applyLifelineDialogBtn" value="default" disabled>Apply</button>
+      <button id="okLifelineDialogBtn" value="default">OK</button>
+      <button id="deleteLifelineDialogBtn" style="float: right;" value="default" hidden>Delete</button>
     </menu>
     </p>
   </div>
@@ -101,13 +116,13 @@
   <div id="messageDialogContent" class="dialogContent">
     <input  id="messageIdx" value="new">
     </p>
-      <label for="fromObject">from:</label>
-      <select name="fromObject" id="fromObject">
+      <label for="fromLifeline">from:</label>
+      <select name="fromLifeline" id="fromLifeline">
       </select>
     </p>
     <p>
-      <label for="toObject">to:</label>
-      <select name="toObject" id="toObject">
+      <label for="toLifeline">to:</label>
+      <select name="toLifeline" id="toLifeline">
       </select>
     </p>
     <p>

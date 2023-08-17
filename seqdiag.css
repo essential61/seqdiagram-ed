@@ -25,7 +25,7 @@ body, html {
   margin-left: auto;
 }
 
-.button {
+.top-button {
   background-color: #4CBF50; /* Green */
   border: none;
   border-left: 1px solid green;
@@ -39,13 +39,15 @@ body, html {
   cursor: pointer;
   float: left;
 }
-.button:hover {
+
+
+.top-button:hover {
   background-color: #3e8e41;
 }
-#load_file.button {
+#load_file.top-button {
   border-left: none;
 }
-#save_svg.button {
+#save_svg.top-button {
   border-right: 1px solid green;
 }
 
@@ -54,10 +56,60 @@ body, html {
   width: 100%;
 }
 .edit-menu {
-  width: 200px;
-  background-color: #a8a8a8;
-  /*font-weight: bold;*/
+  min-width: 120px;
+  background-color: #555555;
+  display: inline-block;
 }
+
+.menu-button {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  float: left;
+}
+.menu-button:hover {
+  background-color: #333333;
+}
+details summary {
+  background-color: #888888;
+  cursor: pointer;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+details summary > * {
+  display: inline;
+}
+
+.edit-menu label {
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  width: 50%;
+  border: none;
+  outline: none;
+}
+.edit-menu input {
+  width: 6ch;
+}
+.edit-menu select {
+  background-color: #a8a8a8;
+  color: white;
+  width: 100%;
+  border: none;
+  outline: none;
+}
+option {
+  background-color: #a8a8a8;
+  color: white;
+}
+
 .main_pane {
   height: auto;
   min-height: 100% !important;
@@ -113,6 +165,10 @@ table {
   background-color: #aaaaaa;
 }
 
+#finiteLifeline {
+  display: none;
+}
+
 #showSyncResponse {
   display: none;
 }
@@ -125,39 +181,3 @@ table {
   width: 3ch;
 }
 
-details summary {
-  background-color: #888888;
-  cursor: pointer;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-details summary > * {
-  display: inline;
-}
-.edit-menu {
-  background-color: #555555;
-  display: inline-block;
-}
-.edit-menu label {
-  background-color: #a8a8a8;
-    font-family: Arial, Helvetica, sans-serif;
-  color: white;
-  width: 50%;
-  border: none;
-  outline: none;
-}
-.edit-menu input {
-  width: 6ch;
-}
-.edit-menu select {
-  background-color: #a8a8a8;
-  color: white;
-  width: 100%;
-  border: none;
-  outline: none;
-}
-option {
-  background-color: #a8a8a8;
-  color: white;
-}

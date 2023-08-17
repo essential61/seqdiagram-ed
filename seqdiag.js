@@ -1,6 +1,6 @@
 // Globals
 
-let theSourceDoc = { dom: '', fileName: '', isModified: false };
+let theSourceDoc = { dom: '', fileName: 'untitled.uml', isModified: false };
 
 let xslSVG;
 
@@ -29,7 +29,7 @@ function loadEmptyDocument() {
     <parameters>
         <max_t>20</max_t>
     </parameters>
-    <objectlist/>
+    <lifelinelist/>
     <messagelist/>
 </sequencediagml>`;
     const parser = new DOMParser();
@@ -65,31 +65,31 @@ function loadExampleDocument() {
     <parameters>
         <max_t>20</max_t>
     </parameters>
-    <objectlist>
-        <object type="actor">
-          <objectname>myactor</objectname>
+    <lifelinelist>
+        <lifeline type="actor">
+          <lifelinename>myactor</lifelinename>
           <activitybars>
             <activitybar begin_t="2" end_t="4"/>
             <activitybar begin_t="6" end_t="8"/>
           </activitybars>
-        </object>
-        <object type="object">
-          <objectname>object1</objectname>
+        </lifeline>
+        <lifeline type="object">
+          <lifelinename>object 1</lifelinename>
           <activitybars/>
-        </object>
-        <object type="object">
-          <objectname>object2</objectname>
+        </lifeline>
+        <lifeline type="object">
+          <lifelinename>object 2</lifelinename>
           <activitybars/>
-        </object>
-        <object type="object">
-           <objectname>object3</objectname>
+        </lifeline>
+        <lifeline type="object">
+           <lifelinename>object 3</lifelinename>
           <activitybars/>
-        </object>
-        <object type="actor">
-           <objectname>an actor</objectname>
+        </lifeline>
+        <lifeline type="actor">
+           <lifelinename>an actor</lifelinename>
           <activitybars/>
-        </object>
-    </objectlist>
+        </lifeline>
+    </lifelinelist>
     <messagelist>
         <message type="asynchronous" from="1" to="2" t="3">
           <messagetext>a message</messagetext>
@@ -111,65 +111,72 @@ function populateUi() {
     // theSourceDoc.dom and xslSVG are application globals
     const xsltProcessor = new XSLTProcessor();
     xsltProcessor.importStylesheet(xslSVG);
+    if (document.getElementById('showTAxis').checked == true) {
+      xsltProcessor.setParameter(null, 'SHOWSCALE', 'yes');
+    }
     const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
     const theSvgParent=document.getElementById('svg_parent');
     theSvgParent.innerHTML = '';
     theSvgParent.appendChild(theSvgDoc.documentElement);
 
     // re-apply any highlighted svg elements
-    const objectIndex = document.getElementById('objectIdx');
-    if (document.getElementById('objectDialog').style.visibility == 'visible' && !(isNaN(parseInt(objectIndex.value)))) {
-      const objectSvg = document.getElementById('object_' + objectIndex.value);
-      objectSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    const lifelineIndex = document.getElementById('lifelineIdx');
+    if (document.getElementById('lifelineDialog').style.visibility == 'visible') {
+      const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
+      if (lifelineSvg != null) {
+        lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+      }
     }
     const messageIndex = document.getElementById('messageIdx')
-    if (document.getElementById('messageDialog').style.visibility == 'visible' && !(isNaN(parseInt(messageIndex.value)))) {
+    if (document.getElementById('messageDialog').style.visibility == 'visible') {
       const messageSvg = document.getElementById('message_' + messageIndex.value);
-      messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+      if (messageSvg != null) {
+        messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+      }
     }
 
     const maxT = document.getElementById('maxT');
     maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
 
-    const theObjectList = document.getElementById('objects');
-    // clear existing objects from select before re-populating
-    const existingObjects = document.getElementById('existingObjectGroup');
-    if (existingObjects != null) {
-      theObjectList.removeChild(existingObjects);
+    const theLifelineList = document.getElementById('lifelines');
+    // clear existing lifelines from select before re-populating
+    const existingLifelines = document.getElementById('existingLifelineGroup');
+    if (existingLifelines != null) {
+      theLifelineList.removeChild(existingLifelines);
     }
-    let optObjectGroup = document.createElement('optgroup');
-    optObjectGroup.setAttribute('label', 'Edit or Delete');
-    optObjectGroup.setAttribute('id', 'existingObjectGroup');
-    // clear object lists from message dialog
-    const fromList = document.getElementById('fromObject');
+    let optLifelineGroup = document.createElement('optgroup');
+    optLifelineGroup.setAttribute('label', 'Edit or Delete');
+    optLifelineGroup.setAttribute('id', 'existingLifelineGroup');
+    // clear lifeline lists from message dialog
+    const fromList = document.getElementById('fromLifeline');
     const fromSelectedOld = fromList.selectedIndex;
     fromList.innerHTML = '';
-    const toList = document.getElementById('toObject');
+    const toList = document.getElementById('toLifeline');
     const toSelectedOld = toList.selectedIndex;
     toList.innerHTML = '';
-    const objectNodes = theSourceDoc.dom.getElementsByTagName("object");
-    if (objectNodes.length) {
+    const lifelineNodes = theSourceDoc.dom.getElementsByTagName("lifeline");
+    if (lifelineNodes.length) {
 
-      for (i = 0; i <objectNodes.length; i++) {
+      for (i = 0; i <lifelineNodes.length; i++) {
         const option = document.createElement("option");
-        option.innerHTML = (i + 1).toString() + ". " + (objectNodes[i].getElementsByTagName("objectname")[0].textContent).substring(0, 15);
+        option.innerHTML = (i + 1).toString() + ". " + (lifelineNodes[i].getElementsByTagName("lifelinename")[0].textContent).substring(0, 15);
         option.value = i;
-        optObjectGroup.appendChild(option);
+        optLifelineGroup.appendChild(option);
         // populate message dialog "from" and "to" lists
         fromList.appendChild(option.cloneNode(true));
         toList.appendChild(option.cloneNode(true));
-        // add click handler to svg object
-        const objectSvg = document.getElementById('object_' + i);
-        objectSvg.addEventListener('click', showObjectDialogSvg);
+        // add click handler to svg lifeline
+        const lifelineSvg = document.getElementById('lifeline_' + i);
+        lifelineSvg.addEventListener('click', showLifelineDialogSvg);
       }
-      theObjectList.appendChild(optObjectGroup);
-      theObjectList.size = objectNodes.length + 3;
+      theLifelineList.appendChild(optLifelineGroup);
+      theLifelineList.size = lifelineNodes.length + 3;
       fromList.selectedIndex = fromSelectedOld;
       toList.selectedIndex = toSelectedOld;
     }
 
     const theMessageList = document.getElementById('messages');
-    // clear existing objects from select before re-populating
+    // clear existing lifelines from select before re-populating
     const existingMessages = document.getElementById('existingMessageGroup');
     if (existingMessages != null) {
       theMessageList.removeChild(existingMessages);
@@ -249,55 +256,58 @@ function saveDocument(content, fileName2Use) {
     URL.revokeObjectURL(link.href);
 }
 ///////////////////////////
-function showObjectDialogSvg(event) {
-  const objectIndex = event.target.parentElement.id.split('_')[1];
-  showObjectDialog(objectIndex);
+function showLifelineDialogSvg(event) {
+  const lifelineIndex = event.target.parentElement.id.split('_')[1];
+  showLifelineDialog(lifelineIndex);
 }
 
-function showObjectDialogSelect(event) {
-  showObjectDialog(event.target.value);
+function showLifelineDialogSelect(event) {
+  showLifelineDialog(event.target.value);
 }
 
-function showObjectDialog(objectIndex) {
-  hideObjectDialog();
-  if (isNaN(parseInt(objectIndex))) {
-    resetObjectDialog();
+function showLifelineDialog(lifelineIndex) {
+  hideLifelineDialog();
+  if (isNaN(parseInt(lifelineIndex))) {
+    resetLifelineDialog();
   } else {
-    populateObjectDialog(objectIndex);
-    const objectSvg = document.getElementById('object_' + objectIndex);
-    objectSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    populateLifelineDialog(lifelineIndex);
+    const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex);
+    lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
   }
-  document.getElementById('objectDialog').style.visibility = 'visible';
+  document.getElementById('lifelineDialog').style.visibility = 'visible';
 }
 
-function resetObjectDialog() {
-  document.getElementById('objectIdx').value = 'new';
-  document.getElementById('objectName').value = '';
-  document.getElementById('objectType').value = 'object';
+function resetLifelineDialog() {
+  document.getElementById('lifelineIdx').value = 'new';
+  document.getElementById('lifelineName').value = '';
+  document.getElementById('lifelineType').value = 'object';
   let barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
   document.getElementById('ebar').value = '';
   document.getElementById('bbar').value = '';
-  document.getElementById('deleteObjectDialogBtn').setAttribute('hidden', 'hidden');
-  disableApplyObjectDialog();
+  document.getElementById('showFiniteLifeline').checked = false;
+  document.getElementById('finiteLifeline').style.display = 'none';
+  document.getElementById('destroyT').value = '';
+  document.getElementById('deleteLifelineDialogBtn').setAttribute('hidden', 'hidden');
+  disableApplyLifelineDialog();
 }
 
-function populateObjectDialog(objectIdx) {
-  const objectData = theSourceDoc.dom.getElementsByTagName("object")[objectIdx];
+function populateLifelineDialog(lifelineIdx) {
+  const lifelineData = theSourceDoc.dom.getElementsByTagName("lifeline")[lifelineIdx];
 //  const s = new XMLSerializer();
-//  const content = s.serializeToString(objectData);
+//  const content = s.serializeToString(lifelineData);
 //  console.log(content);
-  document.getElementById('objectIdx').value = objectIdx;
-  document.getElementById('objectName').value = objectData.getElementsByTagName('objectname')[0].textContent;
-  document.getElementById('objectType').value = objectData.getAttribute('type');
+  document.getElementById('lifelineIdx').value = lifelineIdx;
+  document.getElementById('lifelineName').value = lifelineData.getElementsByTagName('lifelinename')[0].textContent;
+  document.getElementById('lifelineType').value = lifelineData.getAttribute('type');
   let barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
   const actBarTableBody =  document.getElementById('activityBarsRows');
-  const barData = objectData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
+  const barData = lifelineData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
   for (i = 0; i < barData.length; i++) {
     const barRowId = 'barRow_' + i;
     const delBtnId = 'delBtnRow_' + i;;
@@ -306,26 +316,38 @@ function populateObjectDialog(objectIdx) {
   }
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
-  document.getElementById('deleteObjectDialogBtn').removeAttribute('hidden');
-  disableApplyObjectDialog();
-}
-
-function hideObjectDialog() {
-  document.getElementById('objectDialog').style.visibility = 'hidden';
-  const objectIndex = document.getElementById('objectIdx');
-  if (!(isNaN(parseInt(objectIndex.value)))) {
-    const objectSvg = document.getElementById('object_' + objectIndex.value);
-    objectSvg.removeAttribute('filter');
+  if (lifelineData.getAttribute('destroy_t')) {
+    console.log(lifelineData.getAttribute('destroy_t'));
+    document.getElementById('showFiniteLifeline').checked = true;
+    document.getElementById('finiteLifeline').style.display = 'inline-block';
+    document.getElementById('destroyT').value = lifelineData.getAttribute('destroy_t');
+  } else {
+    document.getElementById('showFiniteLifeline').checked = false;
+    document.getElementById('finiteLifeline').style.display = 'none';
+    document.getElementById('destroyT').value = '';
   }
+  document.getElementById('deleteLifelineDialogBtn').removeAttribute('hidden');
+  disableApplyLifelineDialog();
 }
 
-function enableApplyObjectDialog() {
+function hideLifelineDialog() {
+  document.getElementById('lifelineDialog').style.visibility = 'hidden';
+  const lifelineIndex = document.getElementById('lifelineIdx');
+  // if (!(isNaN(parseInt(lifelineIndex.value)))) {
+    const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
+    if (lifelineSvg != null) {
+      lifelineSvg.removeAttribute('filter');
+    }
+  //}
+}
+
+function enableApplyLifelineDialog() {
   // could do cross-field validations here
-  document.getElementById('applyObjectDialogBtn').disabled = false;
+  document.getElementById('applyLifelineDialogBtn').disabled = false;
 }
 
-function disableApplyObjectDialog() {
-  document.getElementById('applyObjectDialogBtn').disabled = true;
+function disableApplyLifelineDialog() {
+  document.getElementById('applyLifelineDialogBtn').disabled = true;
 }
 
 function showMessageDialogSvg (event) {
@@ -358,8 +380,8 @@ function resetMessageDialog() {
   document.getElementById('messageText').value = '';
   document.getElementById('tValue').value = '';
   document.getElementById('deleteMessageDialogBtn').setAttribute('hidden', 'hidden');
-  document.getElementById('fromObject').selectedIndex = -1;
-  document.getElementById('toObject').selectedIndex = -1;
+  document.getElementById('fromLifeline').selectedIndex = -1;
+  document.getElementById('toLifeline').selectedIndex = -1;
   document.getElementById('messageType').selectedIndex = -1;
   disableApplyMessageDialog();
 }
@@ -367,14 +389,14 @@ function resetMessageDialog() {
 function populateMessageDialog(messageIdx) {
   const messageData = theSourceDoc.dom.getElementsByTagName("message")[messageIdx];
 //  const s = new XMLSerializer();
-//  const content = s.serializeToString(objectData);
+//  const content = s.serializeToString(lifelineData);
 //  console.log(content);
   document.getElementById('messageIdx').value = messageIdx;
-  document.getElementById('fromObject').selectedIndex = messageData.getAttribute('from');
+  document.getElementById('fromLifeline').selectedIndex = messageData.getAttribute('from');
   if (messageData.getAttribute('type') == 'reflexive') {
-    document.getElementById('toObject').style.display = "none";
+    document.getElementById('toLifeline').style.display = "none";
   } else {
-    document.getElementById('toObject').selectedIndex = messageData.getAttribute('to');
+    document.getElementById('toLifeline').selectedIndex = messageData.getAttribute('to');
   }
   document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].textContent;
   document.getElementById('tValue').value = messageData.getAttribute('t');
@@ -396,10 +418,13 @@ function populateMessageDialog(messageIdx) {
 function hideMessageDialog() {
   document.getElementById('messageDialog').style.visibility = 'hidden';
   const messageIndex = document.getElementById('messageIdx');
-  if (!(isNaN(parseInt(messageIndex.value)))) {
+  //if (!(isNaN(parseInt(messageIndex.value)))) {
+    console.log(parseInt(messageIndex.value));
     const messageSvg = document.getElementById('message_' + messageIndex.value);
-    messageSvg.removeAttribute('filter');
-  }
+    if (messageSvg != null) {
+      messageSvg.removeAttribute('filter');
+    }
+ // }
 }
 
 function enableApplyMessageDialog() {
@@ -435,9 +460,9 @@ function addActivityBar(event) {
   const sbar = document.getElementById('bbar');
   const ebar = document.getElementById('ebar');
   if (+bbar.value < 1 ) {
-    alert("start of activity is not set");
+    alert("Begin activity is not set");
   } else if (+ebar.value  <= +bbar.value) {
-    alert("end of activity must be after start of activity");
+    alert("End of activity must be after beginning activity");
   } else {
     const barList = document.querySelectorAll('.barRow');
     let existingIds = [];
@@ -460,16 +485,25 @@ function addActivityBar(event) {
     theDelBtn.style.width = '3ch';
     sbar.value = "";
     ebar.value = "";
-    enableApplyObjectDialog();
+    enableApplyLifelineDialog();
   }
 }
 
 function removeActivityBar(event) {
     const barId = 'barRow_' + event.target.value;
     document.getElementById(barId).remove();
-    enableApplyObjectDialog();
+    enableApplyLifelineDialog();
 }
 
+function toggleFiniteVisibility(event) {
+  if(event.currentTarget.checked == true)
+  {
+    document.getElementById('finiteLifeline').style.display = "inline-block";
+  } else {
+    document.getElementById('finiteLifeline').style.display = "none";
+  }
+  enableApplyLifelineDialog();
+}
 
 function messageTypeTailorDialog(event) {
   const messageType = event.currentTarget.value;
@@ -477,17 +511,17 @@ function messageTypeTailorDialog(event) {
     case "synchronous":
       document.getElementById('showSyncResponse').checked == false
       document.getElementById('showSyncResponse').style.display = "inline-block";
-      document.getElementById('toObject').style.display = "inline-block";
+      document.getElementById('toLifeline').style.display = "inline-block";
       break;
     case "reflexive":
       document.getElementById('showSyncResponse').style.display = "none";
       document.getElementById('syncResponse').style.display = "none";
-      document.getElementById('toObject').style.display = "none";
+      document.getElementById('toLifeline').style.display = "none";
       break;
     default:
       document.getElementById('showSyncResponse').style.display = "none";
       document.getElementById('syncResponse').style.display = "none";
-      document.getElementById('toObject').style.display = "inline-block";
+      document.getElementById('toLifeline').style.display = "inline-block";
   }
   enableApplyMessageDialog();
 }
@@ -502,16 +536,20 @@ function toggleResponseVisibility(event) {
   enableApplyMessageDialog();
 }
 
-function updateObject() {
+function updateLifeline() {
   let xmlDoc = document.implementation.createDocument("", "", null);
-  let newElement = xmlDoc.createElement('object');
-  const typeAttr = document.getElementById('objectType').value;
+  let newElement = xmlDoc.createElement('lifeline');
+  const typeAttr = document.getElementById('lifelineType').value;
   newElement.setAttribute('type',typeAttr);
-  let newObjectName = xmlDoc.createElement('objectname');
-  const objectName = document.getElementById('objectName').value;
-  const newObjectNameText = xmlDoc.createTextNode(objectName);
-  newObjectName.appendChild(newObjectNameText);
-  newElement.appendChild(newObjectName);
+  if (document.getElementById('showFiniteLifeline').checked) {
+    const destroyT = document.getElementById('destroyT').value;
+    newElement.setAttribute('destroy_t',destroyT);
+  }
+  let newLifelineName = xmlDoc.createElement('lifelinename');
+  const lifelineName = document.getElementById('lifelineName').value;
+  const newLifelineNameText = xmlDoc.createTextNode(lifelineName);
+  newLifelineName.appendChild(newLifelineNameText);
+  newElement.appendChild(newLifelineName);
 
   let newActivityBars = xmlDoc.createElement('activitybars');
   const barList = document.querySelectorAll('.barRow');
@@ -535,50 +573,50 @@ function updateObject() {
   //const s = new XMLSerializer();
   //const content = s.serializeToString(newElement);
   //console.log(content);
-  const objectIdx = document.getElementById('objectIdx');
-  const objectList = theSourceDoc.dom.getElementsByTagName("objectlist")[0];
-  if (isNaN(parseInt(objectIdx.value))) {
+  const lifelineIdx = document.getElementById('lifelineIdx');
+  const lifelineList = theSourceDoc.dom.getElementsByTagName("lifelinelist")[0];
+  if (isNaN(parseInt(lifelineIdx.value))) {
     // append if new.
-    objectList.appendChild(newElement);
+    lifelineList.appendChild(newElement);
     // update Idx hidden text field
-    objectIdx.value = objectList.childNodes.length - 1;
+    lifelineIdx.value = lifelineList.childNodes.length - 1;
   } else {
     // replace if existing
-    theOldObject = objectList.getElementsByTagName('object')[objectIdx.value];
-    objectList.replaceChild(newElement, theOldObject);
+    theOldLifeline = lifelineList.getElementsByTagName('lifeline')[lifelineIdx.value];
+    lifelineList.replaceChild(newElement, theOldLifeline);
   }
   theSourceDoc.isModified = true;
   populateUi();
-  disableApplyObjectDialog();
+  disableApplyLifelineDialog();
 }
 
-function okObject() {
-  if (document.getElementById('applyObjectDialogBtn').disabled == false) {
-    updateObject();
+function okLifeline() {
+  if (document.getElementById('applyLifelineDialogBtn').disabled == false) {
+    updateLifeline();
   }
-  hideObjectDialog();
+  hideLifelineDialog();
 }
 
-function deleteObject () {
-  const objectIdx = document.getElementById('objectIdx');
-  const objectList = theSourceDoc.dom.getElementsByTagName('objectlist')[0];
-  const object2BRemoved = objectList.getElementsByTagName('object')[objectIdx.value];
-  objectList.removeChild(object2BRemoved);
+function deleteLifeline () {
+  const lifelineIdx = document.getElementById('lifelineIdx');
+  const lifelineList = theSourceDoc.dom.getElementsByTagName('lifelinelist')[0];
+  const lifeline2BRemoved = lifelineList.getElementsByTagName('lifeline')[lifelineIdx.value];
+  lifelineList.removeChild(lifeline2BRemoved);
   theSourceDoc.isModified = true;
   populateUi();
-  hideObjectDialog();
+  hideLifelineDialog();
 }
 
 function updateMessage() {
   let xmlDoc = document.implementation.createDocument("", "", null);
   let newElement = xmlDoc.createElement('message');
   const typeAttr = document.getElementById('messageType').value;
-  const fromAttr = document.getElementById('fromObject').value;
+  const fromAttr = document.getElementById('fromLifeline').value;
   const tAttr = document.getElementById('tValue').value;
   newElement.setAttribute('type',typeAttr);
   newElement.setAttribute('from',fromAttr);
   if (!(typeAttr == 'reflexive')) {
-    const toAttr = document.getElementById('toObject').value;
+    const toAttr = document.getElementById('toLifeline').value;
     newElement.setAttribute('to',toAttr);
   }
   newElement.setAttribute('t',tAttr);
@@ -686,35 +724,40 @@ document.onreadystatechange = () => {
     saveSvgElement.addEventListener("click", saveSvgDocument, false);
     document.addEventListener('mouseup', stopDragging);
 
+    const showTAxis = document.getElementById('showTAxis');
+    showTAxis.addEventListener('change', populateUi);
+
     const maxT = document.getElementById('maxT');
     maxT.addEventListener('change', updateMaxT);
 
-    const objects = document.getElementById('objects');
-    objects.addEventListener('click', showObjectDialogSelect);
-    const objectDialogHeader = document.getElementById('objectDialogHeader');
-    objectDialogHeader.addEventListener('mousedown', startDragging);
-    const objectName = document.getElementById('objectName');
-    objectName.addEventListener('change', enableApplyObjectDialog);
-    const objectType = document.getElementById('objectType');
-    objectType.addEventListener('change', enableApplyObjectDialog);
-    const hideDialog = document.getElementById('cancelObjectDialogBtn');
-    hideDialog.addEventListener('click', hideObjectDialog);
-    const applyDialog = document.getElementById('applyObjectDialogBtn');
-    applyDialog.addEventListener('click', updateObject);
-    const okDialog = document.getElementById('okObjectDialogBtn');
-    okDialog.addEventListener('click', okObject);
-    const deleteDialog = document.getElementById('deleteObjectDialogBtn');
-    deleteDialog.addEventListener('click', deleteObject);
+    const lifelines = document.getElementById('lifelines');
+    lifelines.addEventListener('click', showLifelineDialogSelect);
+    const lifelineDialogHeader = document.getElementById('lifelineDialogHeader');
+    lifelineDialogHeader.addEventListener('mousedown', startDragging);
+    const lifelineName = document.getElementById('lifelineName');
+    lifelineName.addEventListener('change', enableApplyLifelineDialog);
+    const lifelineType = document.getElementById('lifelineType');
+    lifelineType.addEventListener('change', enableApplyLifelineDialog);
+    const hideDialog = document.getElementById('cancelLifelineDialogBtn');
+    hideDialog.addEventListener('click', hideLifelineDialog);
+    const applyDialog = document.getElementById('applyLifelineDialogBtn');
+    applyDialog.addEventListener('click', updateLifeline);
+    const okDialog = document.getElementById('okLifelineDialogBtn');
+    okDialog.addEventListener('click', okLifeline);
+    const deleteDialog = document.getElementById('deleteLifelineDialogBtn');
+    deleteDialog.addEventListener('click', deleteLifeline);
     const newActivityBar = document.getElementById('addBar');
     newActivityBar.addEventListener("click", addActivityBar, false);
+    const showFinite = document.getElementById('showFiniteLifeline');
+    showFinite.addEventListener('click', toggleFiniteVisibility);
 
     const messages = document.getElementById('messages');
     messages.addEventListener('click', showMessageDialogSelect);
     const messageDialogHeader = document.getElementById('messageDialogHeader');
     messageDialogHeader.addEventListener('mousedown', startDragging);
-    const messageFrom = document.getElementById('fromObject');
+    const messageFrom = document.getElementById('fromLifeline');
     messageFrom.addEventListener('change', enableApplyMessageDialog);
-    const messageTo = document.getElementById('toObject');
+    const messageTo = document.getElementById('toLifeline');
     messageTo.addEventListener('change', enableApplyMessageDialog);
     const messageText = document.getElementById('messageText');
     messageText.addEventListener('change', enableApplyMessageDialog);
@@ -738,7 +781,5 @@ document.onreadystatechange = () => {
     deleteMDialog.addEventListener('click', deleteMessage);
 
     window.addEventListener("beforeunload", check4Changes);
-
-    //loadEmptyDocument();
   }
 };
