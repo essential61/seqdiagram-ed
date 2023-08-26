@@ -25,10 +25,6 @@
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
-        <div>
-          <label for="showTAxis">Show t-Axis:</label>
-          <input type="checkbox" id="showTAxis" name="showTAxis"/>
-        </div>
         <p>
           <button id="toggleScaleButton" class="menu-button">Show t Axis</button>
         <p/>
@@ -52,6 +48,16 @@
           <select name="messages" id="messages" size="2">
             <optgroup label="Create" id="newMessageGroup">
               <option value="new">new message</option>
+            </optgroup>
+          </select>
+        </details>
+        </p>
+        <p>
+        <details>
+          <summary>Frames</summary>
+          <select name="frames" id="frames" size="2">
+            <optgroup label="Create" id="newFrameGroup">
+              <option value="new">new frame</option>
             </optgroup>
           </select>
         </details>
@@ -79,7 +85,7 @@
         </select>
     </p>
     <div id="existingActBars">
-      <label>Activity Bars:</label>
+      <span  style="display: inline-block;width: 140px; text-align: right;">Activity Bars:</span>
       <table id="activityBars">
         <thead>
           <tr><td style="width: 8ch;">begin t</td><td style="width: 8ch;">end t</td><td></td></tr>
@@ -89,12 +95,12 @@
       </table>
     </div>
     <div id="newActBar">
-      <label>new bar:</label>
+      <span style="display: inline-block;width: 140px; text-align: right;">new bar:</span>
       <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar" style="width: 3ch;">+</button></td></tr></table>
     </div>
     <p>
     <p>
-      <label for="showFiniteLufeline">Finite lifeline?</label>
+      <label for="showFiniteLifeline">Finite lifeline?</label>
       <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
     </p>
     <div id="finiteLifeline">
@@ -115,7 +121,7 @@
   <div id="messageDialogHeader" class="dialogHeader">Edit Message</div>
   <div id="messageDialogContent" class="dialogContent">
     <input  id="messageIdx" value="new">
-    </p>
+    <p>
       <label for="fromLifeline">from:</label>
       <select name="fromLifeline" id="fromLifeline">
       </select>
@@ -166,5 +172,71 @@
     </p>
   </div>
 </div>
+
+
+<div id="frameDialog" class="dialog">
+  <div id="frameDialogHeader" class="dialogHeader">Edit Frame</div>
+  <div id="frameDialogContent" class="dialogContent">
+    <input  id="frameIdx" value="new">
+    <p>
+      <label for="frameType">Frame Type:</label>
+      <select name="frameType" id="frameType">
+        <option value="SD">SD</option>
+        <option value="LOOP">LOOP</option>
+        <option value="OPT">OPT</option>
+        <option value="ALT">ALT</option>
+      </select>
+    </p>
+    <div id="sd-div">
+      <label for="sdTitle">Diagram Label:</label>
+      <input id="sdTitle" type="text" placeholder="Enter a label for the diagram">
+    </div>
+    <div id="non-sd-div">
+    <p>
+      <label for="cText">Condition Text:</label>
+      <input id="cText" type="text" placeholder="Enter condition for frame">
+    </p>
+    <p>
+      <label for="leftLifeline">left:</label>
+      <select name="leftLifeline" id="leftLifeline">
+      </select>
+    </p>
+    <p>
+      <label for="rightLifeline">right:</label>
+      <select name="rightLifeline" id="rightLifeline">
+      </select>
+    </p>
+    <p>
+      <label for="topT">Top t:</label>
+      <input name="topT" id="topT" type="number" min="1" style="width: 5ch;">
+      </select>
+    </p>
+    <p>
+      <label for="bottomT">Bottom t:</label>
+      <input name="bottomT" id="bottomT" type="number" min="1" style="width: 5ch;">
+      </select>
+    </p>
+    </div>
+    <div id="alt-div">
+    <p>
+      <label for="altText">Alt Condition Text:</label>
+      <input id="altText" type="text" placeholder="Enter alt condition">
+    </p>
+    <p>
+      <label for="altT">ALT Divider t:</label>
+      <input name="altT" id="altT" type="number" min="1" style="width: 5ch;">
+    </p>
+    </div>
+    <p>
+    <menu>
+      <button id="cancelFrameDialogBtn" value="cancel">Cancel</button>
+      <button id="applyFrameDialogBtn" value="default">Apply</button>
+      <button id="okFrameDialogBtn" value="default">OK</button>
+      <button id="deleteFrameDialogBtn" style="float: right;" value="default" hidden>Delete</button>
+    </menu>
+    </p>
+  </div>
+</div>
+
 </body>
 </html>

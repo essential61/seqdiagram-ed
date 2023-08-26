@@ -56,8 +56,8 @@ body, html {
   width: 100%;
 }
 .edit-menu {
-  min-width: 120px;
-  background-color: #555555;
+  min-width: 100px;
+  background-color: #888888;
   display: inline-block;
 }
 
