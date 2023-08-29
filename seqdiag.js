@@ -148,6 +148,13 @@ function populateUi() {
         messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
       }
     }
+    const frameIndex = document.getElementById('frameIdx')
+    if (document.getElementById('frameDialog').style.visibility == 'visible') {
+      const frameSvg = document.getElementById('frame_' + frameIndex.value);
+      if (frameSvg != null) {
+        frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+      }
+    }
 
     const maxT = document.getElementById('maxT');
     maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
@@ -158,9 +165,10 @@ function populateUi() {
     if (existingLifelines != null) {
       theLifelineList.removeChild(existingLifelines);
     }
-    let optLifelineGroup = document.createElement('optgroup');
+    const optLifelineGroup = document.createElement('optgroup');
     optLifelineGroup.setAttribute('label', 'Edit or Delete');
     optLifelineGroup.setAttribute('id', 'existingLifelineGroup');
+
     // clear lifeline lists from message dialog
     const fromList = document.getElementById('fromLifeline');
     const fromSelectedOld = fromList.selectedIndex;
@@ -168,9 +176,16 @@ function populateUi() {
     const toList = document.getElementById('toLifeline');
     const toSelectedOld = toList.selectedIndex;
     toList.innerHTML = '';
+    // clear from frame dialog
+    const leftList = document.getElementById('leftLifeline');
+    const leftSelectedOld = leftList.selectedIndex;
+    leftList.innerHTML = '';
+    const rightList = document.getElementById('rightLifeline');
+    const rightSelectedOld = rightList.selectedIndex;
+    rightList.innerHTML = '';
+
     const lifelineNodes = theSourceDoc.dom.getElementsByTagName("lifeline");
     if (lifelineNodes.length) {
-
       for (i = 0; i <lifelineNodes.length; i++) {
         const option = document.createElement("option");
         option.innerHTML = (i + 1).toString() + ". " + (lifelineNodes[i].getElementsByTagName("lifelinename")[0].textContent).substring(0, 15);
@@ -179,6 +194,9 @@ function populateUi() {
         // populate message dialog "from" and "to" lists
         fromList.appendChild(option.cloneNode(true));
         toList.appendChild(option.cloneNode(true));
+        // populate frame dialog
+        leftList.appendChild(option.cloneNode(true));
+        rightList.appendChild(option.cloneNode(true));
         // add click handler to svg lifeline
         const lifelineSvg = document.getElementById('lifeline_' + i);
         lifelineSvg.addEventListener('click', showLifelineDialogSvg);
@@ -187,15 +205,17 @@ function populateUi() {
       theLifelineList.size = lifelineNodes.length + 3;
       fromList.selectedIndex = fromSelectedOld;
       toList.selectedIndex = toSelectedOld;
+      leftList.selectedIndex = leftSelectedOld;
+      rightList.selectedIndex = rightSelectedOld;
     }
 
     const theMessageList = document.getElementById('messages');
-    // clear existing lifelines from select before re-populating
+    // clear existing messages from select before re-populating
     const existingMessages = document.getElementById('existingMessageGroup');
     if (existingMessages != null) {
       theMessageList.removeChild(existingMessages);
     }
-    let optMessageGroup = document.createElement('optgroup');
+    const optMessageGroup = document.createElement('optgroup');
     optMessageGroup.setAttribute('label', 'Edit or Delete');
     optMessageGroup.setAttribute('id', 'existingMessageGroup');
     const messageNodes = theSourceDoc.dom.getElementsByTagName("message");
@@ -212,6 +232,29 @@ function populateUi() {
       theMessageList.size = messageNodes.length + 3;
     }
 
+    const theFrameList = document.getElementById('frames');
+    // clear existing frames from select before re-populating
+    const existingFrames = document.getElementById('existingFrameGroup');
+    if (existingFrames != null) {
+      theFrameList.removeChild(existingFrames);
+    }
+    const optFrameGroup = document.createElement('optgroup');
+    optFrameGroup.setAttribute('label', 'Edit or Delete');
+    optFrameGroup.setAttribute('id', 'existingFrameGroup');
+    const frameNodes = theSourceDoc.dom.getElementsByTagName("frame");
+    if (frameNodes.length) {
+      for (i = 0; i < frameNodes.length; i++) {
+        const option = document.createElement("option");
+        option.innerHTML = (i + 1).toString() + ". " + frameNodes[i].textContent;
+        option.value = i;
+        optFrameGroup.appendChild(option);
+        const frameSvg = document.getElementById('frame_' + i);
+        frameSvg.addEventListener('click', showFrameDialogSvg);
+      }
+      theFrameList.appendChild(optFrameGroup);
+      theFrameList.size = frameNodes.length + 3;
+    }
+
     const fileBanner = document.getElementById('file_banner');
     fileBanner.innerText = theSourceDoc.fileName;
     if (theSourceDoc.isModified) {
@@ -219,22 +262,17 @@ function populateUi() {
     }
 }
 
-function performTransform(myDoc, myTransform) {
-    // Create an instance of the XSLTProcessor object
-    const xsltProcessor = new XSLTProcessor();
-    xsltProcessor.importStylesheet(myTransform);
-    return xsltProcessor.transformToDocument(myDoc);
-}
-
 function saveUmlDocument() {
     if (theSourceDoc.dom != null) {
-      let filename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName);
+      const filename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName);
       if (filename) {
         if (filename != theSourceDoc.fileName) {
           theSourceDoc.fileName = filename;
         }
         const s = new XMLSerializer();
-        const content = s.serializeToString(theSourceDoc.dom);
+        let content = s.serializeToString(theSourceDoc.dom);
+        content = content.replace(/>\s*/g, '>');
+        content = content.replace(/\s*</g, '<');
         //console.log(content);
         saveDocument(content, theSourceDoc.fileName);
         theSourceDoc.isModified = false;
@@ -246,9 +284,11 @@ function saveUmlDocument() {
 
 function saveSvgDocument() {
     if (theSourceDoc.dom != null) {
-      let svgFilename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName.replace(/\..*/g, '.svg'))
+      const svgFilename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName.replace(/\..*/g, '.svg'))
       if (svgFilename) {
-        const theSvgDoc = performTransform(theSourceDoc.dom, xslSVG);
+        const xsltProcessor = new XSLTProcessor();
+        xsltProcessor.importStylesheet(xslSVG);
+        const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
         const s = new XMLSerializer();
         const contentSvg = s.serializeToString(theSvgDoc);
         saveDocument(contentSvg, svgFilename);
@@ -295,7 +335,7 @@ function resetLifelineDialog() {
   document.getElementById('lifelineIdx').value = 'new';
   document.getElementById('lifelineName').value = '';
   document.getElementById('lifelineType').value = 'object';
-  let barList = document.querySelectorAll('.barRow');
+  const barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
@@ -316,7 +356,7 @@ function populateLifelineDialog(lifelineIdx) {
   document.getElementById('lifelineIdx').value = lifelineIdx;
   document.getElementById('lifelineName').value = lifelineData.getElementsByTagName('lifelinename')[0].textContent;
   document.getElementById('lifelineType').value = lifelineData.getAttribute('type');
-  let barList = document.querySelectorAll('.barRow');
+  const barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
@@ -347,12 +387,10 @@ function populateLifelineDialog(lifelineIdx) {
 function hideLifelineDialog() {
   document.getElementById('lifelineDialog').style.visibility = 'hidden';
   const lifelineIndex = document.getElementById('lifelineIdx');
-  // if (!(isNaN(parseInt(lifelineIndex.value)))) {
-    const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
-    if (lifelineSvg != null) {
-      lifelineSvg.removeAttribute('filter');
-    }
-  //}
+  const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
+  if (lifelineSvg != null) {
+    lifelineSvg.removeAttribute('filter');
+  }
 }
 
 function enableApplyLifelineDialog() {
@@ -407,23 +445,19 @@ function populateMessageDialog(messageIdx) {
 //  console.log(content);
   document.getElementById('messageIdx').value = messageIdx;
   document.getElementById('fromLifeline').selectedIndex = messageData.getAttribute('from');
-  if (messageData.getAttribute('type') == 'reflexive') {
-    document.getElementById('toLifeline').style.display = "none";
-  } else {
+  document.getElementById('messageType').value = messageData.getAttribute('type');
+  messageTypeTailorDialog(messageData.getAttribute('type'));
+  if (messageData.getAttribute('to') != null) {
     document.getElementById('toLifeline').selectedIndex = messageData.getAttribute('to');
   }
   document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].textContent;
   document.getElementById('tValue').value = messageData.getAttribute('t');
-  document.getElementById('messageType').value = messageData.getAttribute('type');
-  if (messageData.getAttribute('type') == 'synchronous') {
-    document.getElementById('showSyncResponse').style.display = "inline-block";
-    if (messageData.getElementsByTagName('response').length) {
-      document.getElementById('showResponse').checked = true;
-      document.getElementById('syncResponse').style.display = "inline-block";
-      const responseTag = messageData.getElementsByTagName('response')[0];
-      document.getElementById('responseText').value = responseTag.textContent;
-      document.getElementById('rtValue').value = responseTag.getAttribute('t');
-    }
+  if (messageData.getElementsByTagName('response').length) {
+    document.getElementById('showResponse').checked = true;
+    document.getElementById('syncResponse').style.display = "inline-block";
+    const responseTag = messageData.getElementsByTagName('response')[0];
+    document.getElementById('responseText').value = responseTag.textContent;
+    document.getElementById('rtValue').value = responseTag.getAttribute('t');
   }
   document.getElementById('deleteMessageDialogBtn').removeAttribute('hidden');
   disableApplyMessageDialog();
@@ -432,13 +466,11 @@ function populateMessageDialog(messageIdx) {
 function hideMessageDialog() {
   document.getElementById('messageDialog').style.visibility = 'hidden';
   const messageIndex = document.getElementById('messageIdx');
-  //if (!(isNaN(parseInt(messageIndex.value)))) {
-    console.log(parseInt(messageIndex.value));
-    const messageSvg = document.getElementById('message_' + messageIndex.value);
-    if (messageSvg != null) {
-      messageSvg.removeAttribute('filter');
-    }
- // }
+  //console.log(parseInt(messageIndex.value));
+  const messageSvg = document.getElementById('message_' + messageIndex.value);
+  if (messageSvg != null) {
+    messageSvg.removeAttribute('filter');
+  }
 }
 
 function enableApplyMessageDialog() {
@@ -477,19 +509,36 @@ function showFrameDialog(frameIndex) {
 function resetFrameDialog() {
   document.getElementById('frameIdx').value = 'new';
   document.getElementById('frameType').selectedIndex = '-1';
+  document.getElementById('frameText').value = '';
+  document.getElementById('textWidth').value = '';
   document.getElementById('leftLifeline').selectedIndex = '-1';
   document.getElementById('rightLifeline').selectedIndex = '-1';
+  document.getElementById('topT').value = '';
+  document.getElementById('bottomT').value = '';
+  document.getElementById('altText').value = '';
+  document.getElementById('altT').value = '';
   disableApplyFrameDialog();
 }
+
 function populateFrameDialog(frameIdx) {
-  const messageData = theSourceDoc.dom.getElementsByTagName("frame")[messageIdx];
-//  const s = new XMLSerializer();
-//  const content = s.serializeToString(lifelineData);
-//  console.log(content);
+  const frameData = theSourceDoc.dom.getElementsByTagName("frame")[frameIdx];
+  const s = new XMLSerializer();
+  const content = s.serializeToString(frameData);
   document.getElementById('frameIdx').value = frameIdx;
+  document.getElementById('frameType').value = frameData.getAttribute('type');
+  frameTypeTailorDialog(frameData.getAttribute('type'));
+  if (frameData.childNodes[0].nodeValue != null) { document.getElementById('frameText').value = frameData.childNodes[0].nodeValue; }
+  if (frameData.getAttribute('widthfactor') != null) { document.getElementById('textWidth').value = frameData.getAttribute('widthfactor'); }
+  if (frameData.getAttribute('left') != null) { document.getElementById('leftLifeline').selectedIndex = frameData.getAttribute('left'); }
+  if (frameData.getAttribute('right') != null) { document.getElementById('rightLifeline').selectedIndex = frameData.getAttribute('right'); }
+  if (frameData.getAttribute('top') != null) { document.getElementById('topT').value = frameData.getAttribute('top'); }
+  if (frameData.getAttribute('bottom') != null) { document.getElementById('bottomT').value = frameData.getAttribute('bottom'); }
+  if (frameData.getAttribute('alttext') != null) { document.getElementById('altText').value = frameData.getAttribute('alttext'); }
+  if (frameData.getAttribute('altt') != null) { document.getElementById('altT').value = frameData.getAttribute('altt'); }
   document.getElementById('deleteFrameDialogBtn').removeAttribute('hidden');
   disableApplyFrameDialog();
 }
+
 function hideFrameDialog() {
   document.getElementById('frameDialog').style.visibility = 'hidden';
   const frameIndex = document.getElementById('frameIdx');
@@ -575,8 +624,11 @@ function toggleFiniteVisibility(event) {
   enableApplyLifelineDialog();
 }
 
-function messageTypeTailorDialog(event) {
-  const messageType = event.currentTarget.value;
+function messageTypeTailorDialogHandler(event) {
+  messageTypeTailorDialog(event.currentTarget.value);
+}
+
+function messageTypeTailorDialog(messageType) {
   switch (messageType) {
     case 'synchronous':
       document.getElementById('showSyncResponse').checked == false
@@ -596,9 +648,11 @@ function messageTypeTailorDialog(event) {
   enableApplyMessageDialog();
 }
 
-function frameTypeTailorDialog(event) {
-  const frameType = event.currentTarget.value;
-  console.log(event.currentTarget.value);
+function frameTypeTailorDialogHandler(event) {
+  frameTypeTailorDialog(event.currentTarget.value);
+}
+
+function frameTypeTailorDialog(frameType) {
   switch (frameType) {
     case 'SD':
       document.getElementById('sd-div').style.display = "inline-block";
@@ -772,53 +826,39 @@ function deleteMessage () {
 function updateFrame() {
   let xmlDoc = document.implementation.createDocument("", "", null);
   let newElement = xmlDoc.createElement('frame');
+  const frameTextValue = document.getElementById('frameText').value;
+  const newFrameTextNode = xmlDoc.createTextNode(frameTextValue);
+  newElement.appendChild(newFrameTextNode);
   const typeAttr = document.getElementById('frameType').value;
-  /*const fromAttr = document.getElementById('fromLifeline').value;
-  const tAttr = document.getElementById('tValue').value;
-  newElement.setAttribute('type',typeAttr);
-  newElement.setAttribute('from',fromAttr);
-  if (!(typeAttr == 'reflexive')) {
-    const toAttr = document.getElementById('toLifeline').value;
-    newElement.setAttribute('to',toAttr);
+  newElement.setAttribute('type', typeAttr);
+  if (typeAttr == 'SD') {
+    newElement.setAttribute('widthfactor', document.getElementById('textWidth').value);
+  } else {
+    newElement.setAttribute('left', document.getElementById('leftLifeline').value);
+    newElement.setAttribute('right', document.getElementById('rightLifeline').value);
+    newElement.setAttribute('top', document.getElementById('topT').value);
+    newElement.setAttribute('bottom', document.getElementById('bottomT').value);
   }
-  newElement.setAttribute('t',tAttr);
-  let newMessageText = xmlDoc.createElement('messagetext');
-  const messageText = document.getElementById('messageText').value;
-  const newMessageTextTextNode = xmlDoc.createTextNode(messageText);
-  newMessageText.appendChild(newMessageTextTextNode);
-  newElement.appendChild(newMessageText);
-  if (typeAttr == 'synchronous' && document.getElementById('showResponse').checked == true) {
-    let newResponse = xmlDoc.createElement('response');
-    const tResponseAttr = document.getElementById('rtValue').value;
-    newResponse.setAttribute('t', tResponseAttr);
-    const responseText = document.getElementById('responseText').value;
-    const newResponseTextNode = xmlDoc.createTextNode(responseText);
-    newResponse.appendChild(newResponseTextNode);
-    newElement.appendChild(newResponse);
+  if (typeAttr == 'ALT') {
+    newElement.setAttribute('alttext', document.getElementById('altText').value);
+    newElement.setAttribute('altt', document.getElementById('altT').value);
   }
-  let messageIdx = document.getElementById('messageIdx');
 
-  const messageList = theSourceDoc.dom.getElementsByTagName("messagelist")[0];
-  messages = messageList.getElementsByTagName('message')
-  if (!(isNaN(parseInt(messageIdx.value)))) {
-    const message2BRemoved = messages[messageIdx.value];
-    messageList.removeChild(message2BRemoved);
+  const frameIdx = document.getElementById('frameIdx');
+  const frameList = theSourceDoc.dom.getElementsByTagName("framelist")[0];
+  if (isNaN(parseInt(frameIdx.value))) {
+    // append if new.
+    frameList.appendChild(newElement);
+    // update Idx hidden text field
+    frameIdx.value = frameList.childNodes.length - 1;
+  } else {
+    // replace if existing
+    theOldFrame = frameList.getElementsByTagName('frame')[frameIdx.value];
+    frameList.replaceChild(newElement, theOldFrame);
   }
-  let inserted = false;
-  for (i = 0; i < messages.length; i++) {
-    if (parseInt(tAttr) < parseInt(messages[i].getAttribute('t'))) {
-      messageList.insertBefore(newElement, messages[i]);
-      messageIdx.value = i;
-      inserted = true;
-      break;
-    }
-  }
-  if (inserted == false) {
-    messageIdx.value = messages.length;
-    messageList.appendChild(newElement);
-  }*/
   theSourceDoc.isModified = true;
   populateUi();
+  disableApplyFrameDialog();
 }
 
 
@@ -853,25 +893,6 @@ function check4Changes (event) {
   }
 }
 
-function sortDocument(doc2BSorted) {
-  const theSortXslString = `<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:param name="SORT" select="@begin_t"</xsl:param>
-  <xsl:strip-space elements="*"/>
-  <xsl:template match="@*|node()">
-    <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:apply-templates select="node()">
-            <xsl:sort select="$SORT" data-type="number"/>
-      </xsl:apply-templates>
-    </xsl:copy>
-  </xsl:template>
-</xsl:stylesheet>`;
-  const parser = new DOMParser();
-  const theXslSort = parser.parseFromString(theSortXslString, 'application/xml');
-  const xsltProcessor = new XSLTProcessor();
-  xsltProcessor.importStylesheet(theXslSort);
-  return xsltProcessor.transformToDocument(doc2BSorted);
-}
 // Add handlers
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
@@ -934,7 +955,7 @@ document.onreadystatechange = () => {
     const hideMsgDialog = document.getElementById('cancelMessageDialogBtn');
     hideMsgDialog.addEventListener('click', hideMessageDialog);
     const messageType = document.getElementById('messageType');
-    messageType.addEventListener('change', messageTypeTailorDialog);
+    messageType.addEventListener('change', messageTypeTailorDialogHandler);
     const showResponse = document.getElementById('showResponse');
     showResponse.addEventListener('click', toggleResponseVisibility);
     const applyMDialog = document.getElementById('applyMessageDialogBtn');
@@ -944,16 +965,31 @@ document.onreadystatechange = () => {
     const deleteMDialog = document.getElementById('deleteMessageDialogBtn');
     deleteMDialog.addEventListener('click', deleteMessage);
 
-
     const frames = document.getElementById('frames');
     frames.addEventListener('click', showFrameDialogSelect);
     const frameDialogHeader = document.getElementById('frameDialogHeader');
     frameDialogHeader.addEventListener('mousedown', startDragging);
+    const frameTxt = document.getElementById('frameText');
+    frameTxt.addEventListener('change', enableApplyFrameDialog);
+    const textWidth = document.getElementById('textWidth');
+    textWidth.addEventListener('change', enableApplyFrameDialog);
+    const lftLiifeline = document.getElementById('leftLifeline');
+    lftLiifeline.addEventListener('change', enableApplyFrameDialog);
+    const rghtLifeline = document.getElementById('rightLifeline');
+    rghtLifeline.addEventListener('change', enableApplyFrameDialog);
 
+    const topT = document.getElementById('topT');
+    topT.addEventListener('change', enableApplyFrameDialog);
+    const bottomT = document.getElementById('bottomT');
+    bottomT.addEventListener('change', enableApplyFrameDialog);
+    const altText = document.getElementById('altText');
+    altText.addEventListener('change', enableApplyFrameDialog);
+    const altT = document.getElementById('altT');
+    altT.addEventListener('change', enableApplyFrameDialog);
     const hideFDialog = document.getElementById('cancelFrameDialogBtn');
     hideFDialog.addEventListener('click', hideFrameDialog);
     const frameType = document.getElementById('frameType');
-    frameType.addEventListener('change', frameTypeTailorDialog);
+    frameType.addEventListener('change', frameTypeTailorDialogHandler);
     const applyFDialog = document.getElementById('applyFrameDialogBtn');
     applyFDialog.addEventListener('click', updateFrame);
     const okFDialog = document.getElementById('okFrameDialogBtn');

@@ -56,23 +56,24 @@ body, html {
   width: 100%;
 }
 .edit-menu {
-  min-width: 100px;
+  width: 120px;
   background-color: #888888;
-  display: inline-block;
+  display: block;
 }
 
 .menu-button {
+  min-width: 120px;
   background-color: #555555;
   border: none;
   color: white;
-  padding: 10px 25px;
+  /*padding: 10px 25px; */
+  display: block;
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 16px;
   cursor: pointer;
-  float: left;
+  /*float: left;*/
 }
 .menu-button:hover {
   background-color: #333333;
@@ -85,7 +86,7 @@ details summary {
 }
 
 details summary > * {
-  display: inline;
+  display: block;
 }
 
 .edit-menu label {
@@ -174,6 +175,18 @@ table {
 }
 
 #syncResponse {
+  display: none;
+}
+
+#sd-div {
+  display: none;
+}
+
+#non-sd-div {
+  display: none;
+}
+
+#alt-div {
   display: none;
 }
 

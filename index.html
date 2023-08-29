@@ -25,13 +25,8 @@
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
-        <p>
           <button id="toggleScaleButton" class="menu-button">Show t Axis</button>
-        <p/>
-        <p>
-          <label for="maxT">Max. t</label>
-          <input id="maxT" type="number" min="1" max="50"/>
-        <p/>
+          <button id="layoutButton" class="menu-button">Layout</button>
         <p>
         <details>
           <summary>Lifelines</summary>
@@ -61,6 +56,11 @@
             </optgroup>
           </select>
         </details>
+        </p>
+        <p>
+          <label for="maxT">Max. t</label>
+          <input id="maxT" type="number" min="1" max="50"/>
+        </p>
       </div>
       <div class="main_pane" id="svg_parent">
       <!--svg goes here-->
@@ -73,16 +73,15 @@
   <div id="lifelineDialogContent" class="dialogContent">
     <input  id="lifelineIdx" value="new">
     <p>
-      <label for="lifelineName">Lifeline Name:</label>
-      <textarea id="lifelineName" placeholder="max 2 lines displayed" rows="2"></textarea>
+      <label for="lifelineType">Lifeline Type:</label>
+      <select name="lifelineType" id="lifelineType">
+        <option value="object">Simple Object</option>
+        <option value="actor">Actor</option>
+      </select>
     </p>
     <p>
-      <label for="lifelineType">Lifeline Type:</label>
-        <select name="lifelineType" id="lifelineType">
-          <option value="object">Simple Object</option>
-          <option value="actor">Actor</option>
-          <option value="-">Other</option>
-        </select>
+      <label for="lifelineName">Lifeline Name:</label>
+      <textarea id="lifelineName" placeholder="max 2 lines displayed" rows="2"></textarea>
     </p>
     <div id="existingActBars">
       <span  style="display: inline-block;width: 140px; text-align: right;">Activity Bars:</span>
@@ -108,7 +107,7 @@
       <input id="destroyT" type="number" min="2" style="width: 5ch;"/>
     </div>
     <menu>
-      <button id="cancelLifelineDialogBtn" value="cancel">Cancel</button>
+      <button id="cancelLifelineDialogBtn" value="cancel">Quit</button>
       <button id="applyLifelineDialogBtn" value="default" disabled>Apply</button>
       <button id="okLifelineDialogBtn" value="default">OK</button>
       <button id="deleteLifelineDialogBtn" style="float: right;" value="default" hidden>Delete</button>
@@ -121,6 +120,15 @@
   <div id="messageDialogHeader" class="dialogHeader">Edit Message</div>
   <div id="messageDialogContent" class="dialogContent">
     <input  id="messageIdx" value="new">
+    <p>
+      <label for="messageType">Message Type:</label>
+      <select name="messageType" id="messageType">
+        <option value="asynchronous" selected>Asynchronous</option>
+        <option value="synchronous">Synchronous</option>
+        <option value="reflexive">Reflexive</option>
+        <option value="create">Create</option>
+      </select>
+    </p>
     <p>
       <label for="fromLifeline">from:</label>
       <select name="fromLifeline" id="fromLifeline">
@@ -139,15 +147,6 @@
       <label for="tValue">Message t:</label>
       <input id="tValue" type="number" min="1" style="width: 5ch;"/>
     </p>
-    <p>
-      <label for="messageType">Message Type:</label>
-      <select name="messageType" id="messageType">
-        <option value="asynchronous" selected>Asynchronous</option>
-        <option value="synchronous">Synchronous</option>
-        <option value="reflexive">Reflexive</option>
-        <option value="create">Create</option>
-      </select>
-    </p>
     <div id="showSyncResponse">
       <label for="showResponse">Show Response:</label>
       <input type="checkbox" id="showResponse" name="showResponse"/>
@@ -164,7 +163,7 @@
     </div>
     <p>
     <menu>
-      <button id="cancelMessageDialogBtn" value="cancel">Cancel</button>
+      <button id="cancelMessageDialogBtn" value="cancel">Quit</button>
       <button id="applyMessageDialogBtn" value="default">Apply</button>
       <button id="okMessageDialogBtn" value="default">OK</button>
       <button id="deleteMessageDialogBtn" style="float: right;" value="default" hidden>Delete</button>
@@ -187,15 +186,15 @@
         <option value="ALT">ALT</option>
       </select>
     </p>
+    <p>
+      <label for="frameText">Frame Text:</label>
+      <input id="frameText" type="text" placeholder="Enter text">
+    </p>
     <div id="sd-div">
-      <label for="sdTitle">Diagram Label:</label>
-      <input id="sdTitle" type="text" placeholder="Enter a label for the diagram">
+      <label for="textWidth">Label Width:</label>
+      <input name="textWidth" id="textWidth" type="number" min="1" style="width: 5ch;">
     </div>
     <div id="non-sd-div">
-    <p>
-      <label for="cText">Condition Text:</label>
-      <input id="cText" type="text" placeholder="Enter condition for frame">
-    </p>
     <p>
       <label for="leftLifeline">left:</label>
       <select name="leftLifeline" id="leftLifeline">
@@ -229,7 +228,7 @@
     </div>
     <p>
     <menu>
-      <button id="cancelFrameDialogBtn" value="cancel">Cancel</button>
+      <button id="cancelFrameDialogBtn" value="cancel">Quit</button>
       <button id="applyFrameDialogBtn" value="default">Apply</button>
       <button id="okFrameDialogBtn" value="default">OK</button>
       <button id="deleteFrameDialogBtn" style="float: right;" value="default" hidden>Delete</button>

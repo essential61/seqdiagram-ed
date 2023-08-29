@@ -37,9 +37,7 @@
         <symbol id="frame-polygon" style="stroke: black; fill: white; stroke-width: 2;">
           <polygon points="0,0 60,0 60,15 50,30 0,30"/>
         </symbol>
-        <xsl:element name="g">
-          <xsl:attribute name="id">actor</xsl:attribute>
-          <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2;</xsl:attribute>
+        <symbol id="actor" style="stroke: black; fill: none; stroke-width: 2;">
           <xsl:element name="circle">
             <xsl:attribute name="cx"><xsl:value-of select="$HSPACING"/></xsl:attribute>
             <xsl:attribute name="cy">20</xsl:attribute>
@@ -69,10 +67,8 @@
             <xsl:attribute name="x2"><xsl:value-of select="$HSPACING + 15"/></xsl:attribute>
             <xsl:attribute name="y2">75</xsl:attribute>
           </xsl:element>
-        </xsl:element>
-        <xsl:element name="g">
-          <xsl:attribute name="id">reflexive</xsl:attribute>
-          <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2;</xsl:attribute>
+        </symbol>
+        <symbol id="reflexive" style="stroke: black; fill: none; stroke-width: 2;">
           <xsl:element name="line">
             <xsl:attribute name="x1">0</xsl:attribute>
             <xsl:attribute name="y1"><xsl:value-of select="$VSPACING"/></xsl:attribute>
@@ -99,7 +95,7 @@
             <xsl:attribute name="height"><xsl:value-of select="$VSPACING"/></xsl:attribute>
             <xsl:attribute name="visibility">hidden</xsl:attribute>
           </xsl:element>
-        </xsl:element>
+        </symbol>
         <symbol id="destroy-symbol" width="20" height="20" style="stroke: black; fill: none; stroke-width: 4;" viewBox="0 0 20 20">
           <line x1="0" y1="0" x2="20" y2="20"/>
           <line x1="20" y1="0" x2="0" y2="20"/>
@@ -429,7 +425,7 @@
             <xsl:value-of select="./text()"/>
           </xsl:element>
         </xsl:when>
-        <xsl:when test="@type = 'LOOP'">
+        <xsl:otherwise>
           <xsl:element name="rect">
             <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left + 0.75)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
@@ -444,13 +440,36 @@
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left + 0.75)) + 10"/></xsl:attribute>
-            <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 15"/></xsl:attribute>
+            <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 5"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start;font-weight: bold;</xsl:attribute>
-            <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
+            <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
             <xsl:value-of select="@type"/>
           </xsl:element>
-        </xsl:when>
-        <xsl:otherwise>
+          <xsl:element name="text">
+            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left + 1)) + 10"/></xsl:attribute>
+            <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 15"/></xsl:attribute>
+            <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+            <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
+            <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
+            <xsl:value-of select="./text()"/>
+          </xsl:element>
+          <xsl:if test="@type = 'ALT'">
+            <xsl:element name="line">
+              <xsl:attribute name="x1"><xsl:value-of select="$HSPACING  * (@left + 0.75)"/></xsl:attribute>
+              <xsl:attribute name="y1"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
+              <xsl:attribute name="x2"><xsl:value-of select="$HSPACING * (@right + 1.25)"/></xsl:attribute>
+              <xsl:attribute name="y2"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
+              <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+            </xsl:element>
+            <xsl:element name="text">
+              <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left + 1)) + 10"/></xsl:attribute>
+              <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @altt) + 5"/></xsl:attribute>
+              <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+              <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
+              <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
+              <xsl:value-of select="@alttext"/>
+            </xsl:element>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:element>
@@ -490,7 +509,7 @@
         <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
         <xsl:attribute name="x">25</xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$I * $VSPACING"/></xsl:attribute>
-        <xsl:attribute name="style">text-anchor: start</xsl:attribute>
+        <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
         <xsl:value-of select="$I"/>
       </xsl:element>
     </xsl:if>
