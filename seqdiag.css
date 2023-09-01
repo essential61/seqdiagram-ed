@@ -11,7 +11,6 @@ body, html {
 }
 .top-middle {
   flex: 1;
-  text-align: center;
   color: white;
   padding: 10px 25px;
   font-family: Arial, Helvetica, sans-serif;
@@ -40,11 +39,11 @@ body, html {
   float: left;
 }
 
-
 .top-button:hover {
   background-color: #3e8e41;
 }
 #load_file.top-button {
+  min-width: 120px;
   border-left: none;
 }
 #save_svg.top-button {
@@ -64,25 +63,31 @@ body, html {
 .menu-button {
   min-width: 120px;
   background-color: #555555;
-  border: none;
+  border: 1px solid #888888;
   color: white;
-  /*padding: 10px 25px; */
+  padding: 10px 10px;
   display: block;
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
   cursor: pointer;
-  /*float: left;*/
 }
 .menu-button:hover {
   background-color: #333333;
 }
 details summary {
-  background-color: #888888;
+  background-color: #555555;
+  border: 1px solid #888888;
   cursor: pointer;
   color: white;
+  padding: 10px 10px;
   font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  font-size: 16px;
+}
+details summary:hover {
+  background-color: #333333;
 }
 
 details summary > * {
@@ -100,14 +105,14 @@ details summary > * {
   width: 6ch;
 }
 .edit-menu select {
-  background-color: #a8a8a8;
+  background-color: #888888;
   color: white;
   width: 100%;
   border: none;
   outline: none;
 }
 option {
-  background-color: #a8a8a8;
+  background-color: #888888;
   color: white;
 }
 
@@ -131,22 +136,33 @@ option {
   font-family: Arial, Helvetica, sans-serif;
 }
 .dialog {
-  width:350px;
+  width:360px;
   display: flex;
   flex-direction: column;
   position: absolute;
-  right: 120px;
   top: 100px;
   border: 1px solid black;
-  /*opacity: 0;
-  pointer-events: none;*/
   visibility: hidden;
 }
+#layoutDialog.dialog {
+  right: 20px;
+}
+#lifelineDialog.dialog {
+  right: 100px;
+}
+#messageDialog.dialog {
+  right: 180px;
+}
+#frameDialog.dialog {
+  right: 360px;
+}
+
 .dialogContent label {
   display: inline-block;
-  width: 140px;
+  width: 130px;
   text-align: right;
 }
+
 .dialog.active {
   opacity: 1;
   pointer-events: auto;
@@ -155,9 +171,7 @@ table {
   display: inline-table;
   border-collapse: collapse;
 }
-/*#activityBars th, #activityBars td {
-  border: solid 1px;
-}*/
+
 #existingActBars {
   background-color: #cccccc;
 }
@@ -166,27 +180,7 @@ table {
   background-color: #aaaaaa;
 }
 
-#finiteLifeline {
-  display: none;
-}
-
-#showSyncResponse {
-  display: none;
-}
-
-#syncResponse {
-  display: none;
-}
-
-#sd-div {
-  display: none;
-}
-
-#non-sd-div {
-  display: none;
-}
-
-#alt-div {
+.initially-hidden {
   display: none;
 }
 

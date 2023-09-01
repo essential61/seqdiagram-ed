@@ -2,20 +2,19 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg">
   <xsl:param  name="SHOWSCALE" select="''"/>
   <!-- space between lifelines -->
-  <xsl:variable name="HSPACING" select="240"/>
+  <xsl:variable name="HSPACING" select="/sequencediagml/parameters/hspacing/text()"/>
   <!-- space between increments of t -->
-  <xsl:variable name="VSPACING" select="20"/>
+  <xsl:variable name="VSPACING" select="/sequencediagml/parameters/vspacing/text()"/>
   <xsl:variable name="SVGWIDTH" select="$HSPACING * (1 + count(/sequencediagml/lifelinelist/lifeline))"/>
   <xsl:variable name="VOFFSET" select="-160"/>
   <xsl:variable name="MAXT" select="/sequencediagml/parameters/max_t/text()"/>
   <xsl:variable name="SVGHEIGHT" select="($VSPACING * ($MAXT + 1)) - $VOFFSET"/>
   <xsl:variable name="ACTIVITYBARWIDTH" select="20"/>
-  <xsl:variable name="FONTSIZE" select="'font-size: 12pt;'"/>
-
+  <xsl:variable name="FONTSIZE" select="/sequencediagml/parameters/fontsize/text()"/>
+  <xsl:variable name="FONTSTRING" select="concat('font-size: ', $FONTSIZE, 'pt;')"/>
   <xsl:template match="/">
     <xsl:element name="svg">
       <xsl:attribute name="width"><xsl:value-of select="$SVGWIDTH"/></xsl:attribute>
-
       <xsl:attribute name="height"><xsl:value-of select="$SVGHEIGHT"/></xsl:attribute>
       <xsl:attribute name="viewBox"><xsl:value-of select="concat('0 ', $VOFFSET, ' ', $SVGWIDTH, ' ', $SVGHEIGHT)"/></xsl:attribute>
       <defs>
@@ -35,7 +34,7 @@
           </xsl:element>
         </symbol>
         <symbol id="frame-polygon" style="stroke: black; fill: white; stroke-width: 2;">
-          <polygon points="0,0 60,0 60,15 50,30 0,30"/>
+          <polygon points="0,0 80,0 80,15 70,30 0,30"/>
         </symbol>
         <symbol id="actor" style="stroke: black; fill: none; stroke-width: 2;">
           <xsl:element name="circle">
@@ -178,7 +177,7 @@
     <xsl:element name="g">
       <xsl:attribute name="id"><xsl:value-of select="concat('lifeline_', $LIFELINEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">all</xsl:attribute>
-      <xsl:attribute name="style"><xsl:value-of select="$FONTSIZE"/></xsl:attribute>
+      <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
       <xsl:element name="use">
         <xsl:attribute name="href"><xsl:value-of select="$HREF"/></xsl:attribute>
         <xsl:attribute name="x"><xsl:value-of select="$HPOS - $HSPACING"/></xsl:attribute>
@@ -286,7 +285,7 @@
     <xsl:element name="g">
       <xsl:attribute name="id"><xsl:value-of select="concat('message_', $MESSAGEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">all</xsl:attribute>
-      <xsl:attribute name="style"><xsl:value-of select="$FONTSIZE"/></xsl:attribute>
+      <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
       <xsl:choose>
         <xsl:when test="@type = 'reflexive'">
           <xsl:element name="use">
@@ -393,7 +392,7 @@
     <xsl:element name="g">
       <xsl:attribute name="id"><xsl:value-of select="concat('frame_', $FRAMEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">visiblePainted</xsl:attribute>
-      <xsl:attribute name="style"><xsl:value-of select="$FONTSIZE"/></xsl:attribute>
+      <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
       <xsl:choose>
         <xsl:when test="@type = 'SD'">
           <xsl:variable name="WIDTHFACTOR">
@@ -446,7 +445,7 @@
             <xsl:value-of select="@type"/>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left + 1)) + 10"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left + 1)) + 30"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 15"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
@@ -478,7 +477,7 @@
   <xsl:template name="tspan">
     <xsl:param name="XPOS"/>
     <xsl:param name="TEXT"/>
-    <xsl:variable name="DY">20</xsl:variable>
+    <xsl:variable name="DY"><xsl:value-of select="$FONTSIZE * 2"/></xsl:variable>
     <xsl:element name="tspan">
       <xsl:attribute name="x"><xsl:value-of select="$XPOS"/></xsl:attribute>
       <xsl:attribute name="dy"><xsl:value-of select="$DY"/></xsl:attribute>

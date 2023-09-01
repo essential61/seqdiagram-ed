@@ -26,41 +26,32 @@
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
           <button id="toggleScaleButton" class="menu-button">Show t Axis</button>
-          <button id="layoutButton" class="menu-button">Layout</button>
-        <p>
-        <details>
-          <summary>Lifelines</summary>
-          <select name="lifelines" id="lifelines" size="2">
-            <optgroup label="Create" id="newLifelineGroup">
-              <option value="new">new lifeline</option>
-            </optgroup>
-          </select>
-        </details>
-        </p>
-        <p>
-        <details>
-          <summary>Messages</summary>
-          <select name="messages" id="messages" size="2">
-            <optgroup label="Create" id="newMessageGroup">
-              <option value="new">new message</option>
-            </optgroup>
-          </select>
-        </details>
-        </p>
-        <p>
-        <details>
-          <summary>Frames</summary>
-          <select name="frames" id="frames" size="2">
-            <optgroup label="Create" id="newFrameGroup">
-              <option value="new">new frame</option>
-            </optgroup>
-          </select>
-        </details>
-        </p>
-        <p>
-          <label for="maxT">Max. t</label>
-          <input id="maxT" type="number" min="1" max="50"/>
-        </p>
+          <button id="layoutButton" class="menu-button">Appearance and Geometry</button>
+          <button id="divButton" class="menu-button">Fit Width</button>
+          <details>
+            <summary>Lifelines</summary>
+            <select name="lifelines" id="lifelines" size="2">
+              <optgroup label="Create" id="newLifelineGroup">
+                <option value="new">new lifeline</option>
+              </optgroup>
+            </select>
+          </details>
+          <details>
+            <summary>Messages</summary>
+            <select name="messages" id="messages" size="2">
+              <optgroup label="Create" id="newMessageGroup">
+                <option value="new">new message</option>
+              </optgroup>
+            </select>
+          </details>
+          <details>
+            <summary>Frames</summary>
+            <select name="frames" id="frames" size="2">
+              <optgroup label="Create" id="newFrameGroup">
+                <option value="new">new frame</option>
+              </optgroup>
+            </select>
+          </details>
       </div>
       <div class="main_pane" id="svg_parent">
       <!--svg goes here-->
@@ -84,7 +75,7 @@
       <textarea id="lifelineName" placeholder="max 2 lines displayed" rows="2"></textarea>
     </p>
     <div id="existingActBars">
-      <span  style="display: inline-block;width: 140px; text-align: right;">Activity Bars:</span>
+      <span  style="display: inline-block;width: 130px; text-align: right;">Activity Bars:</span>
       <table id="activityBars">
         <thead>
           <tr><td style="width: 8ch;">begin t</td><td style="width: 8ch;">end t</td><td></td></tr>
@@ -94,7 +85,7 @@
       </table>
     </div>
     <div id="newActBar">
-      <span style="display: inline-block;width: 140px; text-align: right;">new bar:</span>
+      <span style="display: inline-block;width: 130px; text-align: right;">new bar:</span>
       <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar" style="width: 3ch;">+</button></td></tr></table>
     </div>
     <p>
@@ -102,7 +93,7 @@
       <label for="showFiniteLifeline">Finite lifeline?</label>
       <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
     </p>
-    <div id="finiteLifeline">
+    <div id="finiteLifeline" class="initially-hidden">
       <label for="destroyT">Finish t:</label>
       <input id="destroyT" type="number" min="2" style="width: 5ch;"/>
     </div>
@@ -147,11 +138,11 @@
       <label for="tValue">Message t:</label>
       <input id="tValue" type="number" min="1" style="width: 5ch;"/>
     </p>
-    <div id="showSyncResponse">
+    <div id="showSyncResponse" class="initially-hidden">
       <label for="showResponse">Show Response:</label>
       <input type="checkbox" id="showResponse" name="showResponse"/>
     </div>
-    <div id="syncResponse">
+    <div id="syncResponse" class="initially-hidden">
       <p>
         <label for="responseText">Response Text:</label>
         <textarea id="responseText" placeholder="max 2 lines displayed" rows="2"></textarea>
@@ -190,11 +181,11 @@
       <label for="frameText">Frame Text:</label>
       <input id="frameText" type="text" placeholder="Enter text">
     </p>
-    <div id="sd-div">
+    <div id="sd-div" class="initially-hidden">
       <label for="textWidth">Label Width:</label>
       <input name="textWidth" id="textWidth" type="number" min="1" style="width: 5ch;">
     </div>
-    <div id="non-sd-div">
+    <div id="non-sd-div" class="initially-hidden">
     <p>
       <label for="leftLifeline">left:</label>
       <select name="leftLifeline" id="leftLifeline">
@@ -216,7 +207,7 @@
       </select>
     </p>
     </div>
-    <div id="alt-div">
+    <div id="alt-div" class="initially-hidden">
     <p>
       <label for="altText">Alt Condition Text:</label>
       <input id="altText" type="text" placeholder="Enter alt condition">
@@ -237,5 +228,34 @@
   </div>
 </div>
 
-</body>
+<div id="layoutDialog" class="dialog">
+  <div id="layoutDialogHeader" class="dialogHeader">Edit Geometry and Appearance</div>
+  <div id="layoutDialogContent" class="dialogContent">
+    <p>
+      <label for="hSpacing">Lifeline Spacing:</label>
+      <input id="hSpacing" type="range" min="200" max="300" step="10"/>
+      <span id="hSpacingValue"></span>
+    </p>
+    <p>
+      <label for="vSpacing">Message Spacing:</label>
+      <input id="vSpacing" type="range" min="20" max="30" step="2"/>
+      <span id="vSpacingValue"></span>
+    </p>
+    <p>
+      <label for="maxT">Max. t:</label>
+      <input id="maxT" type="range" min="5" max="50" step="1"/>
+      <span id="maxTValue"></span>
+    </p>
+    <p>
+      <label for="fontSize">Font Size:</label>
+      <input id="fontSize" type="range" min="8" max="16" step="2"/>
+      <span id="fontSizeValue"></span>
+    </p>
+    <menu>
+      <button id="hideLayoutDialogBtn" value="cancel">Quit</button>
+    </menu>
+  </div>
+</div>
+
+  </body>
 </html>

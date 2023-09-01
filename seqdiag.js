@@ -27,7 +27,10 @@ function loadEmptyDocument() {
     const theEmptyTxt = `<?xml version="1.0"?>
 <sequencediagml>
     <parameters>
-        <max_t>20</max_t>
+        <hspacing>240</hspacing>
+        <vspacing>20</vspacing>
+        <max_t>30</max_t>
+        <fontsize>12</fontsize>
     </parameters>
     <lifelinelist/>
     <messagelist/>
@@ -53,6 +56,7 @@ function loadFileDocument() {
         theSourceDoc.dom = parser.parseFromString(contents, "application/xml");
         theSourceDoc.isModified = false;
         theSourceDoc.fileName = file.name;
+        closeDialogs();
         populateUi();
     };
     reader.readAsText(file);
@@ -63,7 +67,10 @@ function loadExampleDocument() {
     const theExampleTxt = `<?xml version="1.0"?>
 <sequencediagml>
     <parameters>
+        <hspacing>240</hspacing>
+        <vspacing>20</vspacing>
         <max_t>30</max_t>
+        <fontsize>12</fontsize>
     </parameters>
     <lifelinelist>
         <lifeline type="actor">
@@ -108,7 +115,15 @@ function loadExampleDocument() {
     theSourceDoc.dom = parser.parseFromString(theExampleTxt, "application/xml");
     theSourceDoc.isModified = false;
     theSourceDoc.fileName = 'example.uml';
+    closeDialogs();
     populateUi();
+}
+
+function closeDialogs() {
+  hideFrameDialog();
+  hideMessageDialog();
+  hideLifelineDialog();
+  hideLayoutDialog();
 }
 
 function tAxisShow(event) {
@@ -156,8 +171,21 @@ function populateUi() {
       }
     }
 
+    const hSpacing = document.getElementById('hSpacing');
+    const hSpacingValue = document.getElementById('hSpacingValue');
+    hSpacingValue.innerText = hSpacing.value = theSourceDoc.dom.getElementsByTagName("hspacing")[0].childNodes[0].nodeValue;
+
+    const vSpacing = document.getElementById('vSpacing');
+    const vSpacingValue = document.getElementById('vSpacingValue');
+    vSpacingValue.innerText = vSpacing.value = theSourceDoc.dom.getElementsByTagName("vspacing")[0].childNodes[0].nodeValue;
+
     const maxT = document.getElementById('maxT');
-    maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
+    const maxTValue = document.getElementById('maxTValue');
+    maxTValue.innerText = maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
+
+    const fontSize = document.getElementById('fontSize');
+    const fontSizeValue = document.getElementById('fontSizeValue');
+    fontSizeValue.innerText = fontSize.value = theSourceDoc.dom.getElementsByTagName("fontsize")[0].childNodes[0].nodeValue;
 
     const theLifelineList = document.getElementById('lifelines');
     // clear existing lifelines from select before re-populating
@@ -879,10 +907,44 @@ function deleteFrame () {
   hideFrameDialog();
 }
 
+function showLayoutDialog() {
+  document.getElementById('layoutDialog').style.visibility = 'visible';
+}
+
+function hideLayoutDialog() {
+  document.getElementById('layoutDialog').style.visibility = 'hidden';
+}
+
+
+function updateHSpacing(event) {
+  const hspacing = theSourceDoc.dom.getElementsByTagName('hspacing')[0]
+  hspacing.childNodes[0].nodeValue = event.target.value;
+  theSourceDoc.isModified = true;
+  document.getElementById('hSpacingValue').innerText = event.target.value;
+  populateUi();
+}
+
+function updateVSpacing(event) {
+  const vspacing = theSourceDoc.dom.getElementsByTagName('vspacing')[0]
+  vspacing.childNodes[0].nodeValue = event.target.value;
+  theSourceDoc.isModified = true;
+  document.getElementById('vSpacingValue').innerText = event.target.value;
+  populateUi();
+}
+
 function updateMaxT(event) {
   const max_t = theSourceDoc.dom.getElementsByTagName('max_t')[0]
   max_t.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
+  document.getElementById('maxTValue').innerText = event.target.value;
+  populateUi();
+}
+
+function updateFontSize(event) {
+  const fontsize = theSourceDoc.dom.getElementsByTagName('fontsize')[0]
+  fontsize.childNodes[0].nodeValue = event.target.value;
+  theSourceDoc.isModified = true;
+  document.getElementById('fontSizeValue').innerText = event.target.value;
   populateUi();
 }
 
@@ -893,6 +955,11 @@ function check4Changes (event) {
   }
 }
 
+function showDivSize (event) {
+  console.log('get here');
+  console.log(document.getElementById('svg_parent').clientWidth);
+  console.log(document.getElementById('svg_parent').clientHeight);
+}
 // Add handlers
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
@@ -910,8 +977,25 @@ document.onreadystatechange = () => {
     const tAxisBtn = document.getElementById('toggleScaleButton');
     tAxisBtn.addEventListener('click', tAxisShow);
 
+    const divBtn = document.getElementById('divButton')
+    divBtn.addEventListener('click', showDivSize);
+
+    const layoutBtn = document.getElementById('layoutButton')
+    layoutBtn.addEventListener('click', showLayoutDialog);
+    const hideLayoutBtn = document.getElementById('hideLayoutDialogBtn');
+    hideLayoutBtn.addEventListener('click', hideLayoutDialog);
+
+    const hSpacing = document.getElementById('hSpacing');
+    hSpacing.addEventListener('input', updateHSpacing);
+    const vSpacing = document.getElementById('vSpacing');
+    vSpacing.addEventListener('input', updateVSpacing);
     const maxT = document.getElementById('maxT');
-    maxT.addEventListener('change', updateMaxT);
+    maxT.addEventListener('input', updateMaxT);
+    const fontSize = document.getElementById('fontSize');
+    fontSize.addEventListener('input', updateFontSize);
+    const layoutDialogHeader = document.getElementById('layoutDialogHeader');
+    layoutDialogHeader.addEventListener('mousedown', startDragging);
+
 
     const lifelines = document.getElementById('lifelines');
     lifelines.addEventListener('click', showLifelineDialogSelect);
