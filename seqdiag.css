@@ -59,6 +59,13 @@ body, html {
   background-color: #888888;
   display: block;
 }
+.scale {
+  color: white;
+  display: block;
+  padding: 10px 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
 
 .menu-button {
   min-width: 120px;

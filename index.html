@@ -5,6 +5,8 @@
     <link rel="shortcut icon" href="#">
     <link rel="stylesheet" href="seqdiag.css">
     <script src="seqdiag.js"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
     <meta charset="UTF-8">
   </head>
   <body>
@@ -20,14 +22,19 @@
       <div class="top-right">
         <button id="load_example" class="top-button">Load Example</button>
         <button id="help" class="top-button">Help</button>
+        <!-- Place this tag where you want the button to render. -->
+        <span style="background-color: #333333; display: inline-block; height: 100%;"><a class="github-button" href="https://github.com/essential61/seqdiagram-ed" data-color-scheme="no-preference: dark_high_contrast; light: dark_high_contrast; dark: dark_high_contrast;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star essential61/seqdiagram-ed on GitHub">Star</a></span>
       </div>
     </div>
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
+        <div class="scale">
+          <div id="scaleValue">100%</div>
+          <input id="scaling" type="range" min="0.3" max="1" step="0.1" value="1"/>
+        </div>
           <button id="toggleScaleButton" class="menu-button">Show t Axis</button>
           <button id="layoutButton" class="menu-button">Appearance and Geometry</button>
-          <button id="divButton" class="menu-button">Fit Width</button>
           <details>
             <summary>Lifelines</summary>
             <select name="lifelines" id="lifelines" size="2">
@@ -62,7 +69,7 @@
 <div id="lifelineDialog" class="dialog">
   <div id="lifelineDialogHeader" class="dialogHeader">Edit Lifeline</div>
   <div id="lifelineDialogContent" class="dialogContent">
-    <input  id="lifelineIdx" value="new">
+    <input  id="lifelineIdx" value="new" hidden>
     <p>
       <label for="lifelineType">Lifeline Type:</label>
       <select name="lifelineType" id="lifelineType">
@@ -72,7 +79,7 @@
     </p>
     <p>
       <label for="lifelineName">Lifeline Name:</label>
-      <textarea id="lifelineName" placeholder="max 2 lines displayed" rows="2"></textarea>
+      <textarea id="lifelineName" placeholder="enter text here" rows="2"></textarea>
     </p>
     <div id="existingActBars">
       <span  style="display: inline-block;width: 130px; text-align: right;">Activity Bars:</span>
@@ -110,7 +117,7 @@
 <div id="messageDialog" class="dialog">
   <div id="messageDialogHeader" class="dialogHeader">Edit Message</div>
   <div id="messageDialogContent" class="dialogContent">
-    <input  id="messageIdx" value="new">
+    <input  id="messageIdx" value="new" hidden>
     <p>
       <label for="messageType">Message Type:</label>
       <select name="messageType" id="messageType">
@@ -132,7 +139,7 @@
     </p>
     <p>
       <label for="messageText">Message Text:</label>
-      <textarea id="messageText" placeholder="max 2 lines displayed" rows="2"></textarea>
+      <textarea id="messageText" placeholder="enter text here" rows="2"></textarea>
     </p>
     <p>
       <label for="tValue">Message t:</label>
@@ -167,7 +174,7 @@
 <div id="frameDialog" class="dialog">
   <div id="frameDialogHeader" class="dialogHeader">Edit Frame</div>
   <div id="frameDialogContent" class="dialogContent">
-    <input  id="frameIdx" value="new">
+    <input  id="frameIdx" value="new" hidden>
     <p>
       <label for="frameType">Frame Type:</label>
       <select name="frameType" id="frameType">

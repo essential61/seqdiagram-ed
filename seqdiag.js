@@ -34,6 +34,7 @@ function loadEmptyDocument() {
     </parameters>
     <lifelinelist/>
     <messagelist/>
+    <framelist/>
 </sequencediagml>`;
     const parser = new DOMParser();
     theSourceDoc.dom = parser.parseFromString(theEmptyTxt, "application/xml");
@@ -64,51 +65,71 @@ function loadFileDocument() {
 
 function loadExampleDocument() {
     // a fixed hard-coded example doc
-    const theExampleTxt = `<?xml version="1.0"?>
+    const theExampleTxt = `<?xml version="1.0" encoding="UTF-8"?>
 <sequencediagml>
     <parameters>
         <hspacing>240</hspacing>
-        <vspacing>20</vspacing>
-        <max_t>30</max_t>
+        <vspacing>26</vspacing>
+        <max_t>20</max_t>
         <fontsize>12</fontsize>
     </parameters>
     <lifelinelist>
         <lifeline type="actor">
-          <lifelinename>myactor</lifelinename>
-          <activitybars>
-            <activitybar begin_t="2" end_t="4"/>
-            <activitybar begin_t="6" end_t="8"/>
-          </activitybars>
+            <lifelinename>random guy</lifelinename>
+            <activitybars>
+                <activitybar begin_t="1" end_t="20"/>
+            </activitybars>
         </lifeline>
         <lifeline type="object">
-          <lifelinename>object 1</lifelinename>
-          <activitybars/>
+            <lifelinename>an object</lifelinename>
+            <activitybars>
+                <activitybar begin_t="1" end_t="20"/>
+            </activitybars>
         </lifeline>
         <lifeline type="object">
-          <lifelinename>object 2</lifelinename>
-          <activitybars/>
+            <lifelinename>another object</lifelinename>
+            <activitybars>
+                <activitybar begin_t="12" end_t="13"/>
+            </activitybars>
+        </lifeline>
+        <lifeline type="object" destroy_t="18">
+            <lifelinename>an ephemeral object</lifelinename>
+            <activitybars>
+                <activitybar begin_t="16" end_t="17"/>
+                <activitybar begin_t="8" end_t="12"/>
+            </activitybars>
         </lifeline>
         <lifeline type="object">
-           <lifelinename>object 3</lifelinename>
-          <activitybars/>
-        </lifeline>
-        <lifeline type="actor">
-           <lifelinename>an actor</lifelinename>
-          <activitybars/>
+            <lifelinename>yet another lifeline</lifelinename>
+            <activitybars>
+                <activitybar begin_t="1" end_t="20"/>
+            </activitybars>
         </lifeline>
     </lifelinelist>
     <messagelist>
-        <message type="asynchronous" from="1" to="2" t="3">
-          <messagetext>a message</messagetext>
+        <message type="asynchronous" from="0" to="1" t="2">
+            <messagetext>begin</messagetext>
         </message>
-        <message type="synchronous" from="2" to="3" t="5">
-          <messagetext>mess</messagetext>
-          <response t="7">blah</response>
+        <message type="create" from="1" to="3" t="3">
+            <messagetext>create object</messagetext>
+        </message>
+        <message type="reflexive" from="1" t="7">
+            <messagetext>reflexive message</messagetext>
+        </message>
+        <message type="synchronous" from="4" to="3" t="8">
+            <messagetext>synchronous message</messagetext>
+            <response t="12">response</response>
+        </message>
+        <message type="asynchronous" from="1" to="2" t="12">
+            <messagetext>asynchronous message</messagetext>
+        </message>
+        <message type="asynchronous" from="1" to="3" t="16">
+            <messagetext>destroy object</messagetext>
         </message>
     </messagelist>
     <framelist>
-      <frame type="SD" widthfactor="2">Example Sequence Diagram</frame>
-      <frame type="LOOP" left="1" right="3" top="10" bottom="20">[loop condition]</frame>
+        <frame type="SD" widthfactor="1">Example Diagram</frame>
+        <frame type="ALT" left="1" right="2" top="5" bottom="14" alttext="[else]" altt="10">[condition x]</frame>
     </framelist>
 </sequencediagml>`;
     const parser = new DOMParser();
@@ -136,10 +157,17 @@ function tAxisShow(event) {
   populateUi();
 }
 
+function updateScale(event) {
+  document.getElementById('scaleValue').innerText = (event.target.value * 100) + '%';
+  populateUi();
+}
+
 function populateUi() {
     // theSourceDoc.dom and xslSVG are application globals
     const xsltProcessor = new XSLTProcessor();
     xsltProcessor.importStylesheet(xslSVG);
+    const scaleFactor = document.getElementById('scaling').value;
+    xsltProcessor.setParameter(null, 'SCALEFACTOR', scaleFactor);
     if (document.getElementById('toggleScaleButton').textContent == 'Hide t Axis') {
       xsltProcessor.setParameter(null, 'SHOWSCALE', 'yes');
     }
@@ -171,21 +199,7 @@ function populateUi() {
       }
     }
 
-    const hSpacing = document.getElementById('hSpacing');
-    const hSpacingValue = document.getElementById('hSpacingValue');
-    hSpacingValue.innerText = hSpacing.value = theSourceDoc.dom.getElementsByTagName("hspacing")[0].childNodes[0].nodeValue;
-
-    const vSpacing = document.getElementById('vSpacing');
-    const vSpacingValue = document.getElementById('vSpacingValue');
-    vSpacingValue.innerText = vSpacing.value = theSourceDoc.dom.getElementsByTagName("vspacing")[0].childNodes[0].nodeValue;
-
-    const maxT = document.getElementById('maxT');
-    const maxTValue = document.getElementById('maxTValue');
-    maxTValue.innerText = maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
-
-    const fontSize = document.getElementById('fontSize');
-    const fontSizeValue = document.getElementById('fontSizeValue');
-    fontSizeValue.innerText = fontSize.value = theSourceDoc.dom.getElementsByTagName("fontsize")[0].childNodes[0].nodeValue;
+    populateLayoutDialog();
 
     const theLifelineList = document.getElementById('lifelines');
     // clear existing lifelines from select before re-populating
@@ -360,9 +374,10 @@ function showLifelineDialog(lifelineIndex) {
 }
 
 function resetLifelineDialog() {
+  document.getElementById('lifelineDialogHeader').textContent = 'New Lifeline';
   document.getElementById('lifelineIdx').value = 'new';
+  document.getElementById('lifelineType').selectedIndex = -1;
   document.getElementById('lifelineName').value = '';
-  document.getElementById('lifelineType').value = 'object';
   const barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
@@ -377,6 +392,7 @@ function resetLifelineDialog() {
 }
 
 function populateLifelineDialog(lifelineIdx) {
+  document.getElementById('lifelineDialogHeader').textContent = 'Edit Lifeline'
   const lifelineData = theSourceDoc.dom.getElementsByTagName("lifeline")[lifelineIdx];
 //  const s = new XMLSerializer();
 //  const content = s.serializeToString(lifelineData);
@@ -399,7 +415,6 @@ function populateLifelineDialog(lifelineIdx) {
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
   if (lifelineData.getAttribute('destroy_t')) {
-    console.log(lifelineData.getAttribute('destroy_t'));
     document.getElementById('showFiniteLifeline').checked = true;
     document.getElementById('finiteLifeline').style.display = 'inline-block';
     document.getElementById('destroyT').value = lifelineData.getAttribute('destroy_t');
@@ -423,7 +438,11 @@ function hideLifelineDialog() {
 
 function enableApplyLifelineDialog() {
   // could do cross-field validations here
-  document.getElementById('applyLifelineDialogBtn').disabled = false;
+  if (document.getElementById('lifelineType').selectedIndex == '-1') {
+    alert('please select a lifeline type');
+  } else {
+    document.getElementById('applyLifelineDialogBtn').disabled = false;
+  }
 }
 
 function disableApplyLifelineDialog() {
@@ -456,17 +475,19 @@ function showMessageDialog(messageIndex) {
 }
 
 function resetMessageDialog() {
+  document.getElementById('messageDialogHeader').textContent = 'New Message';
   document.getElementById('messageIdx').value = 'new';
+  document.getElementById('messageType').selectedIndex = -1;
   document.getElementById('messageText').value = '';
   document.getElementById('tValue').value = '';
   document.getElementById('deleteMessageDialogBtn').setAttribute('hidden', 'hidden');
   document.getElementById('fromLifeline').selectedIndex = -1;
   document.getElementById('toLifeline').selectedIndex = -1;
-  document.getElementById('messageType').selectedIndex = -1;
   disableApplyMessageDialog();
 }
 
 function populateMessageDialog(messageIdx) {
+  document.getElementById('messageDialogHeader').textContent = 'Edit Message';
   const messageData = theSourceDoc.dom.getElementsByTagName("message")[messageIdx];
 //  const s = new XMLSerializer();
 //  const content = s.serializeToString(lifelineData);
@@ -503,7 +524,11 @@ function hideMessageDialog() {
 
 function enableApplyMessageDialog() {
   // could do cross-field validations here
-  document.getElementById('applyMessageDialogBtn').disabled = false;
+  if (document.getElementById('messageType').selectedIndex == '-1') {
+    alert('please select a message type');
+  } else {
+    document.getElementById('applyMessageDialogBtn').disabled = false;
+  }
 }
 
 function disableApplyMessageDialog() {
@@ -535,6 +560,7 @@ function showFrameDialog(frameIndex) {
 }
 
 function resetFrameDialog() {
+  document.getElementById('frameDialogHeader').textContent = 'New Frame';
   document.getElementById('frameIdx').value = 'new';
   document.getElementById('frameType').selectedIndex = '-1';
   document.getElementById('frameText').value = '';
@@ -549,6 +575,7 @@ function resetFrameDialog() {
 }
 
 function populateFrameDialog(frameIdx) {
+  document.getElementById('frameDialogHeader').textContent = 'Edit Frame';
   const frameData = theSourceDoc.dom.getElementsByTagName("frame")[frameIdx];
   const s = new XMLSerializer();
   const content = s.serializeToString(frameData);
@@ -577,7 +604,11 @@ function hideFrameDialog() {
 }
 function enableApplyFrameDialog() {
   // could do cross-field validations here
-  document.getElementById('applyFrameDialogBtn').disabled = false;
+  if (document.getElementById('frameType').selectedIndex == '-1') {
+    alert('please select a frame type');
+  } else {
+    document.getElementById('applyFrameDialogBtn').disabled = false;
+  }
 }
 
 function disableApplyFrameDialog() {
@@ -736,7 +767,6 @@ function updateLifeline() {
     newActivityBar.setAttribute('end_t', end_tValue);
     for (j = 0; j < newActivityBars.childNodes.length; j++) {
       if (begin_tValue < newActivityBars.childNodes[j].getAttribute('begin_t')) {
-        alert(begin_tValue);
         newActivityBars.insertBefore(newActivityBar, newActivityBars.children[j]);
         continue outerLoop;
       }
@@ -908,6 +938,7 @@ function deleteFrame () {
 }
 
 function showLayoutDialog() {
+  populateLayoutDialog();
   document.getElementById('layoutDialog').style.visibility = 'visible';
 }
 
@@ -915,6 +946,23 @@ function hideLayoutDialog() {
   document.getElementById('layoutDialog').style.visibility = 'hidden';
 }
 
+function populateLayoutDialog() {
+    const hSpacing = document.getElementById('hSpacing');
+    const hSpacingValue = document.getElementById('hSpacingValue');
+    hSpacingValue.innerText = hSpacing.value = theSourceDoc.dom.getElementsByTagName("hspacing")[0].childNodes[0].nodeValue;
+
+    const vSpacing = document.getElementById('vSpacing');
+    const vSpacingValue = document.getElementById('vSpacingValue');
+    vSpacingValue.innerText = vSpacing.value = theSourceDoc.dom.getElementsByTagName("vspacing")[0].childNodes[0].nodeValue;
+
+    const maxT = document.getElementById('maxT');
+    const maxTValue = document.getElementById('maxTValue');
+    maxTValue.innerText = maxT.value = theSourceDoc.dom.getElementsByTagName("max_t")[0].childNodes[0].nodeValue;
+
+    const fontSize = document.getElementById('fontSize');
+    const fontSizeValue = document.getElementById('fontSizeValue');
+    fontSizeValue.innerText = fontSize.value = theSourceDoc.dom.getElementsByTagName("fontsize")[0].childNodes[0].nodeValue;
+}
 
 function updateHSpacing(event) {
   const hspacing = theSourceDoc.dom.getElementsByTagName('hspacing')[0]
@@ -955,11 +1003,6 @@ function check4Changes (event) {
   }
 }
 
-function showDivSize (event) {
-  console.log('get here');
-  console.log(document.getElementById('svg_parent').clientWidth);
-  console.log(document.getElementById('svg_parent').clientHeight);
-}
 // Add handlers
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
@@ -974,11 +1017,11 @@ document.onreadystatechange = () => {
     saveSvgElement.addEventListener("click", saveSvgDocument, false);
     document.addEventListener('mouseup', stopDragging);
 
+    const scaling = document.getElementById('scaling');
+    scaling.addEventListener('input', updateScale);
+
     const tAxisBtn = document.getElementById('toggleScaleButton');
     tAxisBtn.addEventListener('click', tAxisShow);
-
-    const divBtn = document.getElementById('divButton')
-    divBtn.addEventListener('click', showDivSize);
 
     const layoutBtn = document.getElementById('layoutButton')
     layoutBtn.addEventListener('click', showLayoutDialog);
