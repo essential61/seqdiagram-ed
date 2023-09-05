@@ -100,7 +100,7 @@ function loadExampleDocument() {
             </activitybars>
         </lifeline>
         <lifeline type="object">
-            <lifelinename>yet another lifeline</lifelinename>
+            <lifelinename>yet another object</lifelinename>
             <activitybars>
                 <activitybar begin_t="1" end_t="20"/>
             </activitybars>
@@ -145,6 +145,10 @@ function closeDialogs() {
   hideMessageDialog();
   hideLifelineDialog();
   hideLayoutDialog();
+}
+
+function getMaxT() {
+  return theSourceDoc.dom.getElementsByTagName('max_t')[0].textContent;
 }
 
 function tAxisShow(event) {
@@ -287,7 +291,7 @@ function populateUi() {
     if (frameNodes.length) {
       for (i = 0; i < frameNodes.length; i++) {
         const option = document.createElement("option");
-        option.innerHTML = (i + 1).toString() + ". " + frameNodes[i].textContent;
+        option.innerHTML = (i + 1).toString() + ". " + frameNodes[i].getAttribute('type') + ' ' + frameNodes[i].textContent;
         option.value = i;
         optFrameGroup.appendChild(option);
         const frameSvg = document.getElementById('frame_' + i);
@@ -363,6 +367,8 @@ function showLifelineDialogSelect(event) {
 
 function showLifelineDialog(lifelineIndex) {
   hideLifelineDialog();
+  const maxT = getMaxT();
+  document.getElementById('destroyT').setAttribute('max', maxT - 1);
   if (isNaN(parseInt(lifelineIndex))) {
     resetLifelineDialog();
   } else {
@@ -459,6 +465,9 @@ function showMessageDialogSelect (event) {
 
 function showMessageDialog(messageIndex) {
   hideMessageDialog();
+  const maxT = getMaxT();
+  document.getElementById('tValue').setAttribute('max', maxT);
+  document.getElementById('rtValue').setAttribute('max', maxT);
   document.getElementById('showSyncResponse').style.display = "none";
   document.getElementById('syncResponse').style.display = "none";
   document.getElementById('showResponse').checked = false;
@@ -547,6 +556,9 @@ function showFrameDialogSelect(event) {
 
 function showFrameDialog(frameIndex) {
   hideFrameDialog();
+  const maxT = getMaxT();
+  document.getElementById('topT').setAttribute('max', maxT - 1);
+  document.getElementById('bottomT').setAttribute('max', maxT);
   if (isNaN(parseInt(frameIndex))) {
     resetFrameDialog();
   } else {

@@ -200,13 +200,6 @@
         <xsl:attribute name="y2"><xsl:value-of select="$LIFELINEEND"/></xsl:attribute>
         <xsl:attribute name="style">stroke: black; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
       </xsl:element>
-      <xsl:if test="@destroy_t &lt; $MAXT">
-        <xsl:element name="use">
-          <xsl:attribute name="href">#destroy-symbol</xsl:attribute>
-          <xsl:attribute name="x"><xsl:value-of select="$HPOS - 10"/></xsl:attribute>
-          <xsl:attribute name="y"><xsl:value-of select="$LIFELINEEND - 10"/></xsl:attribute>
-        </xsl:element>
-      </xsl:if>
       <xsl:element name="text">
         <xsl:attribute name="x"><xsl:value-of select="$HPOS"/></xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$TEXTPOSITION"/></xsl:attribute>
@@ -235,6 +228,13 @@
           <xsl:attribute name="style">stroke: black; fill: white; stroke-width: 2;</xsl:attribute>
         </xsl:element>
       </xsl:for-each>
+      <xsl:if test="@destroy_t &lt; $MAXT">
+        <xsl:element name="use">
+          <xsl:attribute name="href">#destroy-symbol</xsl:attribute>
+          <xsl:attribute name="x"><xsl:value-of select="$HPOS - 10"/></xsl:attribute>
+          <xsl:attribute name="y"><xsl:value-of select="$LIFELINEEND - 10"/></xsl:attribute>
+        </xsl:element>
+      </xsl:if>
     </xsl:element>
   </xsl:template>
 
