@@ -81,7 +81,7 @@
       <label for="lifelineName">Lifeline Name:</label>
       <textarea id="lifelineName" placeholder="enter text here" rows="2"></textarea>
     </p>
-    <div id="existingActBars">
+    <div id="existingActBars" class="initially-hidden">
       <span  style="display: inline-block;width: 130px; text-align: right;">Activity Bars:</span>
       <table id="activityBars">
         <thead>
@@ -91,26 +91,36 @@
         </tbody>
       </table>
     </div>
-    <div id="newActBar">
+    <p>
+    <label for="showNewActBar">New Activity Bar?</label>
+    <input type="checkbox" id="showNewActBar" name="showNewActBar"/>
+
+    <div id="newActBar" class="initially-hidden">
       <span style="display: inline-block;width: 130px; text-align: right;">new bar:</span>
-      <table><tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td><td><button id="addBar" style="width: 3ch;">+</button></td></tr></table>
+      <table>
+        <thead>
+          <tr><td style="width: 8ch;">begin t</td><td style="width: 8ch;">end t</td><td></td></tr>
+        </thead>
+        <tbody>
+          <tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td></tr>
+        </tbody>
+      </table>
     </div>
-    <p>
-    <p>
-      <label for="showFiniteLifeline">Finite lifeline?</label>
-      <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
     </p>
+    <p>
+    <label for="showFiniteLifeline">Finite lifeline?</label>
+    <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
     <div id="finiteLifeline" class="initially-hidden">
       <label for="destroyT">Finish t:</label>
       <input id="destroyT" type="number" min="2" style="width: 5ch;"/>
     </div>
+    </p>
     <menu>
       <button id="cancelLifelineDialogBtn" value="cancel">Quit</button>
       <button id="applyLifelineDialogBtn" value="default" disabled>Apply</button>
       <button id="okLifelineDialogBtn" value="default">OK</button>
       <button id="deleteLifelineDialogBtn" style="float: right;" value="default" hidden>Delete</button>
     </menu>
-    </p>
   </div>
 </div>
 

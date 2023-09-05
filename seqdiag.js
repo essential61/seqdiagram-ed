@@ -95,8 +95,8 @@ function loadExampleDocument() {
         <lifeline type="object" destroy_t="18">
             <lifelinename>an ephemeral object</lifelinename>
             <activitybars>
-                <activitybar begin_t="16" end_t="17"/>
                 <activitybar begin_t="8" end_t="12"/>
+                <activitybar begin_t="16" end_t="17"/>
             </activitybars>
         </lifeline>
         <lifeline type="object">
@@ -388,6 +388,8 @@ function resetLifelineDialog() {
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
+  document.getElementById('showNewActBar').checked = false;
+  document.getElementById('newActBar').style.display = 'none';
   document.getElementById('ebar').value = '';
   document.getElementById('bbar').value = '';
   document.getElementById('showFiniteLifeline').checked = false;
@@ -406,20 +408,10 @@ function populateLifelineDialog(lifelineIdx) {
   document.getElementById('lifelineIdx').value = lifelineIdx;
   document.getElementById('lifelineName').value = lifelineData.getElementsByTagName('lifelinename')[0].textContent;
   document.getElementById('lifelineType').value = lifelineData.getAttribute('type');
-  const barList = document.querySelectorAll('.barRow');
-  for (i = 0; i < barList.length; i++) {
-    barList[i].remove();
-  }
-  const actBarTableBody =  document.getElementById('activityBarsRows');
   const barData = lifelineData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
-  for (i = 0; i < barData.length; i++) {
-    const barRowId = 'barRow_' + i;
-    const delBtnId = 'delBtnRow_' + i;;
-    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
-    document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
-  }
-  document.getElementById('bbar').value = '';
-  document.getElementById('ebar').value = '';
+
+  resetActivityBars(barData);
+
   if (lifelineData.getAttribute('destroy_t')) {
     document.getElementById('showFiniteLifeline').checked = true;
     document.getElementById('finiteLifeline').style.display = 'inline-block';
@@ -431,6 +423,27 @@ function populateLifelineDialog(lifelineIdx) {
   }
   document.getElementById('deleteLifelineDialogBtn').removeAttribute('hidden');
   disableApplyLifelineDialog();
+}
+
+function resetActivityBars(barData) {
+  const barList = document.querySelectorAll('.barRow');
+  for (i = 0; i < barList.length; i++) {
+    barList[i].remove();
+  }
+  const actBarTableBody =  document.getElementById('activityBarsRows');
+  if (barData.length) {
+    document.getElementById('existingActBars').style.display = 'inline-block';
+  }
+  for (i = 0; i < barData.length; i++) {
+    const barRowId = 'barRow_' + i;
+    const delBtnId = 'delBtnRow_' + i;;
+    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
+    document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
+  }
+  document.getElementById('showNewActBar').checked = false;
+  document.getElementById('newActBar').style.display = 'none';
+  document.getElementById('bbar').value = '';
+  document.getElementById('ebar').value = '';
 }
 
 function hideLifelineDialog() {
@@ -645,7 +658,7 @@ function dragDialog(event) {
   dialog.style.setProperty("top", `${top + event.movementY}px`);
 }
 
-function addActivityBar(event) {
+/*function addActivityBar(event) {
   // Validate values
   const sbar = document.getElementById('bbar');
   const ebar = document.getElementById('ebar');
@@ -677,12 +690,34 @@ function addActivityBar(event) {
     ebar.value = "";
     enableApplyLifelineDialog();
   }
-}
+}*/
 
 function removeActivityBar(event) {
     const barId = 'barRow_' + event.target.value;
     document.getElementById(barId).remove();
     enableApplyLifelineDialog();
+}
+
+function bbarInput(event) {
+  //console.log('get here');
+  //console.log(event.currentTarget.value);
+  const ebar = document.getElementById('ebar');
+  const ebarMinValue = parseInt(event.currentTarget.value) + 1;
+  ebar.setAttribute('min', ebarMinValue);
+  if (ebar.value < ebarMinValue) {
+    ebar.value = ebarMinValue;
+  }
+  enableApplyLifelineDialog();
+}
+
+function toggleNewActBar(event) {
+  if(event.currentTarget.checked == true)
+  {
+    document.getElementById('newActBar').style.display = "inline-block";
+  } else {
+    document.getElementById('newActBar').style.display = "none";
+  }
+  //enableApplyLifelineDialog();
 }
 
 function toggleFiniteVisibility(event) {
@@ -691,8 +726,8 @@ function toggleFiniteVisibility(event) {
     document.getElementById('finiteLifeline').style.display = "inline-block";
   } else {
     document.getElementById('finiteLifeline').style.display = "none";
+    enableApplyLifelineDialog();
   }
-  enableApplyLifelineDialog();
 }
 
 function messageTypeTailorDialogHandler(event) {
@@ -754,37 +789,51 @@ function toggleResponseVisibility(event) {
 }
 
 function updateLifeline() {
-  let xmlDoc = document.implementation.createDocument("", "", null);
-  let newElement = xmlDoc.createElement('lifeline');
+  const xmlDoc = document.implementation.createDocument("", "", null);
+  const newElement = xmlDoc.createElement('lifeline');
   const typeAttr = document.getElementById('lifelineType').value;
   newElement.setAttribute('type',typeAttr);
   if (document.getElementById('showFiniteLifeline').checked) {
     const destroyT = document.getElementById('destroyT').value;
     newElement.setAttribute('destroy_t',destroyT);
   }
-  let newLifelineName = xmlDoc.createElement('lifelinename');
+  const newLifelineName = xmlDoc.createElement('lifelinename');
   const lifelineName = document.getElementById('lifelineName').value;
   const newLifelineNameText = xmlDoc.createTextNode(lifelineName);
   newLifelineName.appendChild(newLifelineNameText);
   newElement.appendChild(newLifelineName);
 
-  let newActivityBars = xmlDoc.createElement('activitybars');
+  const newActivityBars = xmlDoc.createElement('activitybars');
   const barList = document.querySelectorAll('.barRow');
   outerLoop:
-  for (i = 0; i < barList.length; i++) {
-    let newActivityBar = xmlDoc.createElement('activitybar');
+  for (let i = 0; i < barList.length; i++) {
+    const activityBar = xmlDoc.createElement('activitybar');
     const begin_tValue = barList[i].firstChild.textContent;
     const end_tValue = barList[i].children[1].textContent;
-    newActivityBar.setAttribute('begin_t', begin_tValue);
-    newActivityBar.setAttribute('end_t', end_tValue);
-    for (j = 0; j < newActivityBars.childNodes.length; j++) {
-      if (begin_tValue < newActivityBars.childNodes[j].getAttribute('begin_t')) {
+    activityBar.setAttribute('begin_t', begin_tValue);
+    activityBar.setAttribute('end_t', end_tValue);
+    newActivityBars.appendChild(activityBar);
+  }
+  // add new bar here
+  let inserted = false;
+  if (document.getElementById('showNewActBar').checked) {
+    const newActivityBar = xmlDoc.createElement('activitybar');
+    const newBegin_tValue = parseInt(document.getElementById('bbar').value);
+    const newEnd_tValue = parseInt(document.getElementById('ebar').value);
+    newActivityBar.setAttribute('begin_t', newBegin_tValue);
+    newActivityBar.setAttribute('end_t', newEnd_tValue);
+    for (let j = 0; j < newActivityBars.childNodes.length; j++) {
+      if (newBegin_tValue < parseInt(newActivityBars.childNodes[j].getAttribute('begin_t'))) {
         newActivityBars.insertBefore(newActivityBar, newActivityBars.children[j]);
-        continue outerLoop;
+        inserted = true;
+        break
       }
     }
-    newActivityBars.appendChild(newActivityBar);
+    if (inserted == false) {
+      newActivityBars.appendChild(activityBar);
+    }
   }
+
   newElement.appendChild(newActivityBars);
   //const s = new XMLSerializer();
   //const content = s.serializeToString(newElement);
@@ -801,6 +850,9 @@ function updateLifeline() {
     theOldLifeline = lifelineList.getElementsByTagName('lifeline')[lifelineIdx.value];
     lifelineList.replaceChild(newElement, theOldLifeline);
   }
+  const lifelineData = theSourceDoc.dom.getElementsByTagName('lifeline')[lifelineIdx.value]
+  const barData = lifelineData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
+  resetActivityBars(barData);
   theSourceDoc.isModified = true;
   populateUi();
   disableApplyLifelineDialog();
@@ -1068,8 +1120,12 @@ document.onreadystatechange = () => {
     okDialog.addEventListener('click', okLifeline);
     const deleteDialog = document.getElementById('deleteLifelineDialogBtn');
     deleteDialog.addEventListener('click', deleteLifeline);
-    const newActivityBar = document.getElementById('addBar');
-    newActivityBar.addEventListener("click", addActivityBar, false);
+    const showNewActBar = document.getElementById('showNewActBar');
+    showNewActBar.addEventListener('click', toggleNewActBar);
+    const bbar = document.getElementById('bbar');
+    bbar.addEventListener('input', bbarInput);
+    //const newActivityBar = document.getElementById('addBar');
+    //newActivityBar.addEventListener("click", addActivityBar, false);
     const showFinite = document.getElementById('showFiniteLifeline');
     showFinite.addEventListener('click', toggleFiniteVisibility);
     const destroyT = document.getElementById('destroyT');
