@@ -369,6 +369,8 @@ function showLifelineDialog(lifelineIndex) {
   hideLifelineDialog();
   const maxT = getMaxT();
   document.getElementById('destroyT').setAttribute('max', maxT - 1);
+  document.getElementById('bbar').setAttribute('max', maxT - 1);
+  document.getElementById('ebar').setAttribute('max', maxT);
   if (isNaN(parseInt(lifelineIndex))) {
     resetLifelineDialog();
   } else {
@@ -433,12 +435,14 @@ function resetActivityBars(barData) {
   const actBarTableBody =  document.getElementById('activityBarsRows');
   if (barData.length) {
     document.getElementById('existingActBars').style.display = 'inline-block';
-  }
-  for (i = 0; i < barData.length; i++) {
-    const barRowId = 'barRow_' + i;
-    const delBtnId = 'delBtnRow_' + i;;
-    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
-    document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
+    for (i = 0; i < barData.length; i++) {
+      const barRowId = 'barRow_' + i;
+      const delBtnId = 'delBtnRow_' + i;;
+      actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
+      document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
+    }
+  } else {
+    document.getElementById('existingActBars').style.display = 'none';
   }
   document.getElementById('showNewActBar').checked = false;
   document.getElementById('newActBar').style.display = 'none';
@@ -570,7 +574,7 @@ function showFrameDialogSelect(event) {
 function showFrameDialog(frameIndex) {
   hideFrameDialog();
   const maxT = getMaxT();
-  document.getElementById('topT').setAttribute('max', maxT - 1);
+  document.getElementById('topT').setAttribute('max', maxT - 2);
   document.getElementById('bottomT').setAttribute('max', maxT);
   if (isNaN(parseInt(frameIndex))) {
     resetFrameDialog();
@@ -579,8 +583,6 @@ function showFrameDialog(frameIndex) {
     const frameSvg = document.getElementById('frame_' + frameIndex);
     frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
   }
-  //const existingFrames = theSourceDoc.dom.getElementsByTagName("framelist")[0];
-  //console.log(existingFrames.querySelector("[*|type = 'SD']"));
   document.getElementById('frameDialog').style.visibility = 'visible';
 }
 
@@ -657,40 +659,6 @@ function dragDialog(event) {
   dialog.style.setProperty("left", `${left + event.movementX}px`);
   dialog.style.setProperty("top", `${top + event.movementY}px`);
 }
-
-/*function addActivityBar(event) {
-  // Validate values
-  const sbar = document.getElementById('bbar');
-  const ebar = document.getElementById('ebar');
-  if (+bbar.value < 1 ) {
-    alert("Begin activity is not set");
-  } else if (+ebar.value  <= +bbar.value) {
-    alert("End of activity must be after beginning activity");
-  } else {
-    const barList = document.querySelectorAll('.barRow');
-    let existingIds = [];
-    for (i = 0; i < barList.length; i++) {
-      barList[i].getAttribute('barRowId_' + i);
-      existingIds.push(i);
-    }
-    let j;
-    for (j = barList.length; j > -1; j--) {
-      if (!(existingIds.includes(j))) {
-        break;
-      }
-    }
-    const barRowId = 'barRow_' + j;
-    const delBtnId = 'delBtnRow_' + j;
-    const actBarTableBody =  document.getElementById('activityBars').getElementsByTagName('tbody')[0];
-    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + bbar.value + '</td><td>' + ebar.value + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + j + '">-</button></td></tr>');
-    const theDelBtn = document.getElementById(delBtnId);
-    theDelBtn.addEventListener("click", removeActivityBar, false);
-    theDelBtn.style.width = '3ch';
-    sbar.value = "";
-    ebar.value = "";
-    enableApplyLifelineDialog();
-  }
-}*/
 
 function removeActivityBar(event) {
     const barId = 'barRow_' + event.target.value;
@@ -786,6 +754,33 @@ function toggleResponseVisibility(event) {
     document.getElementById('syncResponse').style.display = "none";
   }
   enableApplyMessageDialog();
+}
+
+
+function tValueInput(event) {
+  const rtValue = document.getElementById('rtValue');
+  const rtMinValue = parseInt(event.currentTarget.value) + 1;
+  rtValue.setAttribute('min', rtMinValue);
+  if (rtValue.value < rtMinValue) {
+    rtValue.value = rtMinValue;
+  }
+  enableApplyMessageDialog();
+}
+
+function topTInput(event) {
+  const bottomTValue = document.getElementById('bottomT');
+  const bottomTMinValue = parseInt(event.currentTarget.value) + 2;
+  bottomTValue.setAttribute('min', bottomTMinValue);
+  if (bottomTValue.value < bottomTMinValue) {
+    bottomTValue.value = bottomTMinValue;
+  }
+  const altTValue = document.getElementById('altT');
+  const altTMinValue = parseInt(event.currentTarget.value) + 1;
+  altTValue.setAttribute('min', altTMinValue);
+  if (altTValue.value < altTMinValue) {
+    altTValue.value = altTMinValue;
+  }
+  enableApplyFrameDialog();
 }
 
 function updateLifeline() {
@@ -1124,8 +1119,6 @@ document.onreadystatechange = () => {
     showNewActBar.addEventListener('click', toggleNewActBar);
     const bbar = document.getElementById('bbar');
     bbar.addEventListener('input', bbarInput);
-    //const newActivityBar = document.getElementById('addBar');
-    //newActivityBar.addEventListener("click", addActivityBar, false);
     const showFinite = document.getElementById('showFiniteLifeline');
     showFinite.addEventListener('click', toggleFiniteVisibility);
     const destroyT = document.getElementById('destroyT');
@@ -1142,7 +1135,7 @@ document.onreadystatechange = () => {
     const messageText = document.getElementById('messageText');
     messageText.addEventListener('change', enableApplyMessageDialog);
     const messageT = document.getElementById('tValue');
-    messageT.addEventListener('change', enableApplyMessageDialog);
+    messageT.addEventListener('input', tValueInput);
     const messageResponse = document.getElementById('responseText');
     messageResponse.addEventListener('change', enableApplyMessageDialog);
     const rtValue = document.getElementById('rtValue');
@@ -1174,7 +1167,8 @@ document.onreadystatechange = () => {
     rghtLifeline.addEventListener('change', enableApplyFrameDialog);
 
     const topT = document.getElementById('topT');
-    topT.addEventListener('change', enableApplyFrameDialog);
+    //topT.addEventListener('change', enableApplyFrameDialog);
+    topT.addEventListener('input', topTInput);
     const bottomT = document.getElementById('bottomT');
     bottomT.addEventListener('change', enableApplyFrameDialog);
     const altText = document.getElementById('altText');
