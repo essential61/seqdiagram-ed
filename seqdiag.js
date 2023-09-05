@@ -830,7 +830,7 @@ function updateLifeline() {
       }
     }
     if (inserted == false) {
-      newActivityBars.appendChild(activityBar);
+      newActivityBars.appendChild(newActivityBar);
     }
   }
 
