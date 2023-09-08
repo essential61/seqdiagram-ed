@@ -334,6 +334,7 @@ function saveSvgDocument() {
       if (svgFilename) {
         const xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xslSVG);
+        xsltProcessor.setParameter(null, 'BOUNDINGRECTS', 'no');
         const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
         const s = new XMLSerializer();
         const contentSvg = s.serializeToString(theSvgDoc);

@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg">
   <xsl:param  name="SHOWSCALE" select="''"/>
   <xsl:param  name="SCALEFACTOR" select="1"/>
+  <xsl:param  name="BOUNDINGRECTS" select="'yes'"/>
   <!-- space between lifelines -->
   <xsl:variable name="HSPACING" select="/sequencediagml/parameters/hspacing/text()"/>
   <!-- space between increments of t -->
@@ -250,6 +251,16 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="MESSAGEOFFSETTO">
+      <xsl:choose>
+        <xsl:when test="@type = 'create'">
+          <xsl:value-of select="($MESSAGEOFFSET div ($ACTIVITYBARWIDTH div 2)) * (0.4 * $HSPACING)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$MESSAGEOFFSET"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="XBOUNDRECT">
       <xsl:choose>
         <xsl:when test="@to > @from">
@@ -260,6 +271,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="ABSMESSAGEOFFSETS" select="($MESSAGEOFFSET + $MESSAGEOFFSETTO)*($MESSAGEOFFSET + $MESSAGEOFFSETTO >= 0) - ($MESSAGEOFFSET + $MESSAGEOFFSETTO)*($MESSAGEOFFSET + $MESSAGEOFFSETTO &lt; 0)"/>
+    <xsl:variable name="WIDTHBOUNDRECT" select="(((@from - @to)*((@from - @to) >=0) - (@from - @to)*((@from - @to) &lt; 0)) * $HSPACING) - $ABSMESSAGEOFFSETS"/>
     <xsl:variable name="ARROWTYPE">
       <xsl:choose>
         <xsl:when test="@type = 'asynchronous' or @type = 'create'">
@@ -280,16 +293,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-   <xsl:variable name="MESSAGEOFFSETTO">
-      <xsl:choose>
-        <xsl:when test="@type = 'create'">
-          <xsl:value-of select="($MESSAGEOFFSET div ($ACTIVITYBARWIDTH div 2)) * (0.4 * $HSPACING)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$MESSAGEOFFSET"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+
     <xsl:variable name="MESSAGEANCHOR"><xsl:value-of select="concat('text-anchor: ', substring('end;', 1 div (contains($MESSAGEOFFSET, '-'))), substring('start;', 1 div not(contains($MESSAGEOFFSET, '-'))))"/></xsl:variable>
     <xsl:variable name="RESPONSEANCHOR"><xsl:value-of select="concat('text-anchor: ', substring('start;', 1 div (contains($MESSAGEOFFSET, '-'))), substring('end;', 1 div not(contains($MESSAGEOFFSET, '-'))))"/></xsl:variable>
     <xsl:element name="g">
@@ -349,13 +353,15 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:element>
-          <xsl:element name="rect">
-            <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
-            <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 3.5"/></xsl:attribute>
-            <xsl:attribute name="width"><xsl:value-of select="$HSPACING - (2 * $MESSAGEOFFSET)"/></xsl:attribute>
-            <xsl:attribute name="height">7</xsl:attribute>
-            <xsl:attribute name="visibility">hidden</xsl:attribute>
-          </xsl:element>
+          <xsl:if test="$BOUNDINGRECTS = 'yes'">
+            <xsl:element name="rect">
+              <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
+              <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 3.5"/></xsl:attribute>
+              <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
+              <xsl:attribute name="height">7</xsl:attribute>
+              <xsl:attribute name="visibility">hidden</xsl:attribute>
+            </xsl:element>
+          </xsl:if>
 
           <xsl:if test="count(response)">
             <xsl:element name="line">
@@ -384,13 +390,15 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:element>
-            <xsl:element name="rect">
-              <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
-              <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 3.5"/></xsl:attribute>
-              <xsl:attribute name="width"><xsl:value-of select="$HSPACING - (2 * $MESSAGEOFFSET)"/></xsl:attribute>
-              <xsl:attribute name="height">7</xsl:attribute>
-              <xsl:attribute name="visibility">hidden</xsl:attribute>
-            </xsl:element>
+            <xsl:if test="$BOUNDINGRECTS = 'yes'">
+              <xsl:element name="rect">
+                <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
+                <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 3.5"/></xsl:attribute>
+                <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
+                <xsl:attribute name="height">7</xsl:attribute>
+                <xsl:attribute name="visibility">hidden</xsl:attribute>
+              </xsl:element>
+            </xsl:if>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
