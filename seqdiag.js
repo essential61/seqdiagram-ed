@@ -597,6 +597,7 @@ function resetFrameDialog() {
   document.getElementById('rightLifeline').selectedIndex = '-1';
   document.getElementById('topT').value = '';
   document.getElementById('bottomT').value = '';
+  document.getElementById('narrowFrame').checked = false;
   document.getElementById('altText').value = '';
   document.getElementById('altT').value = '';
   disableApplyFrameDialog();
@@ -616,6 +617,7 @@ function populateFrameDialog(frameIdx) {
   if (frameData.getAttribute('right') != null) { document.getElementById('rightLifeline').selectedIndex = frameData.getAttribute('right'); }
   if (frameData.getAttribute('top') != null) { document.getElementById('topT').value = frameData.getAttribute('top'); }
   if (frameData.getAttribute('bottom') != null) { document.getElementById('bottomT').value = frameData.getAttribute('bottom'); }
+  if (frameData.getAttribute('narrow') == 'true') { document.getElementById('narrowFrame').checked = true; } else { document.getElementById('narrowFrame').checked = false; }
   if (frameData.getAttribute('alttext') != null) { document.getElementById('altText').value = frameData.getAttribute('alttext'); }
   if (frameData.getAttribute('altt') != null) { document.getElementById('altT').value = frameData.getAttribute('altt'); }
   document.getElementById('deleteFrameDialogBtn').removeAttribute('hidden');
@@ -961,7 +963,9 @@ function updateFrame() {
     newElement.setAttribute('alttext', document.getElementById('altText').value);
     newElement.setAttribute('altt', document.getElementById('altT').value);
   }
-
+  if (document.getElementById('narrowFrame').checked = true) {
+    newElement.setAttribute('narrow', 'true');
+  }
   const frameIdx = document.getElementById('frameIdx');
   const frameList = theSourceDoc.dom.getElementsByTagName("framelist")[0];
   if (isNaN(parseInt(frameIdx.value))) {

@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg">
   <xsl:param  name="SHOWSCALE" select="''"/>
   <xsl:param  name="SCALEFACTOR" select="1"/>
+  <!-- invisible bounding rects to make it easier to click on lines -->
   <xsl:param  name="BOUNDINGRECTS" select="'yes'"/>
   <!-- space between lifelines -->
   <xsl:variable name="HSPACING" select="/sequencediagml/parameters/hspacing/text()"/>
@@ -443,20 +444,26 @@
           </xsl:element>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:variable name="FRAMEPADDING">
+            <xsl:choose>
+              <xsl:when test="@narrow = 'true'">0.15</xsl:when>
+              <xsl:otherwise>0.25</xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:element name="rect">
-            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - 0.25)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
-            <xsl:attribute name="width"><xsl:value-of select="$HSPACING * (@right - @left + 0.5)"/></xsl:attribute>
+            <xsl:attribute name="width"><xsl:value-of select="$HSPACING * (@right - @left + (2 * $FRAMEPADDING))"/></xsl:attribute>
             <xsl:attribute name="height"><xsl:value-of select="$VSPACING * (@bottom - @top)"/></xsl:attribute>
             <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2;</xsl:attribute>
           </xsl:element>
           <xsl:element name="use">
             <xsl:attribute name="href">#frame-polygon</xsl:attribute>
-            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - 0.25)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left - 0.25)) + 10"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left - $FRAMEPADDING)) + 10"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 5"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start;font-weight: bold;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
@@ -472,9 +479,9 @@
           </xsl:element>
           <xsl:if test="@type = 'ALT'">
             <xsl:element name="line">
-              <xsl:attribute name="x1"><xsl:value-of select="$HSPACING  * (@left - 0.25)"/></xsl:attribute>
+              <xsl:attribute name="x1"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
               <xsl:attribute name="y1"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
-              <xsl:attribute name="x2"><xsl:value-of select="$HSPACING * (@right + 0.25)"/></xsl:attribute>
+              <xsl:attribute name="x2"><xsl:value-of select="$HSPACING * (@right + $FRAMEPADDING)"/></xsl:attribute>
               <xsl:attribute name="y2"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
               <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
             </xsl:element>

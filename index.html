@@ -162,7 +162,7 @@
     <div id="syncResponse" class="initially-hidden">
       <p>
         <label for="responseText">Response Text:</label>
-        <textarea id="responseText" placeholder="max 2 lines displayed" rows="2"></textarea>
+        <textarea id="responseText" placeholder="enter text here" rows="2"></textarea>
       </p>
       <p>
         <label for="rtValue">Response t:</label>
@@ -192,6 +192,9 @@
         <option value="LOOP">LOOP</option>
         <option value="OPT">OPT</option>
         <option value="ALT">ALT</option>
+        <option value="BREAK">BREAK</option>
+        <option value="PAR">PAR</option>
+        <option value="SEQ">SEQ</option>
       </select>
     </p>
     <p>
@@ -223,7 +226,10 @@
       <input name="bottomT" id="bottomT" type="number" min="1" style="width: 5ch;">
       </select>
     </p>
-    </div>
+    <p>
+      <label for="narrowFrame">Narrow:</label>
+      <input type="checkbox" id="narrowFrame" name="narrowFrame"/>
+    </p>
     <div id="alt-div" class="initially-hidden">
     <p>
       <label for="altText">Alt Condition Text:</label>
