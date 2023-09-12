@@ -161,6 +161,7 @@ option {
   right: 180px;
 }
 #frameDialog.dialog {
+  width:450px;
   right: 360px;
 }
 
@@ -183,8 +184,8 @@ table {
   background-color: #cccccc;
 }
 
-#newActBar {
-  background-color: #aaaaaa;
+#operands {
+  background-color: #cccccc;
 }
 
 .initially-hidden {

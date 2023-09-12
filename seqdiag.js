@@ -128,8 +128,13 @@ function loadExampleDocument() {
         </message>
     </messagelist>
     <framelist>
-        <frame type="SD" widthfactor="1">Example Diagram</frame>
-        <frame type="ALT" left="1" right="2" top="5" bottom="14" alttext="[else]" altt="10">[condition x]</frame>
+        <frame type="SD" widthfactor="1">
+            <operand>Example Diagram</operand>
+        </frame>
+        <frame type="ALT" left="1" right="2" top="5" bottom="14" alttext="[else]" altt="10">
+            <operand t="5">[condition x]</operand>
+            <operand t="10">[else]</operand>
+        </frame>
     </framelist>
 </sequencediagml>`;
     const parser = new DOMParser();
@@ -391,8 +396,6 @@ function resetLifelineDialog() {
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
   }
-  document.getElementById('showNewActBar').checked = false;
-  document.getElementById('newActBar').style.display = 'none';
   document.getElementById('ebar').value = '';
   document.getElementById('bbar').value = '';
   document.getElementById('showFiniteLifeline').checked = false;
@@ -413,7 +416,7 @@ function populateLifelineDialog(lifelineIdx) {
   document.getElementById('lifelineType').value = lifelineData.getAttribute('type');
   const barData = lifelineData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
 
-  resetActivityBars(barData);
+  populateActivityBars(barData);
 
   if (lifelineData.getAttribute('destroy_t')) {
     document.getElementById('showFiniteLifeline').checked = true;
@@ -428,7 +431,7 @@ function populateLifelineDialog(lifelineIdx) {
   disableApplyLifelineDialog();
 }
 
-function resetActivityBars(barData) {
+function populateActivityBars(barData) {
   const barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
     barList[i].remove();
@@ -445,8 +448,6 @@ function resetActivityBars(barData) {
   } else {
     document.getElementById('existingActBars').style.display = 'none';
   }
-  document.getElementById('showNewActBar').checked = false;
-  document.getElementById('newActBar').style.display = 'none';
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
 }
@@ -598,8 +599,10 @@ function resetFrameDialog() {
   document.getElementById('topT').value = '';
   document.getElementById('bottomT').value = '';
   document.getElementById('narrowFrame').checked = false;
-  document.getElementById('altText').value = '';
-  document.getElementById('altT').value = '';
+
+  document.getElementById('newOperandT').value = '';
+  document.getElementById('newOperandText').value = '';
+
   disableApplyFrameDialog();
 }
 
@@ -611,17 +614,47 @@ function populateFrameDialog(frameIdx) {
   document.getElementById('frameIdx').value = frameIdx;
   document.getElementById('frameType').value = frameData.getAttribute('type');
   frameTypeTailorDialog(frameData.getAttribute('type'));
-  if (frameData.childNodes[0].nodeValue != null) { document.getElementById('frameText').value = frameData.childNodes[0].nodeValue; }
+  if (frameData.getElementsByTagName('operand')[0].textContent != null) { document.getElementById('frameText').value = frameData.getElementsByTagName('operand')[0].textContent; }
   if (frameData.getAttribute('widthfactor') != null) { document.getElementById('textWidth').value = frameData.getAttribute('widthfactor'); }
   if (frameData.getAttribute('left') != null) { document.getElementById('leftLifeline').selectedIndex = frameData.getAttribute('left'); }
   if (frameData.getAttribute('right') != null) { document.getElementById('rightLifeline').selectedIndex = frameData.getAttribute('right'); }
   if (frameData.getAttribute('top') != null) { document.getElementById('topT').value = frameData.getAttribute('top'); }
   if (frameData.getAttribute('bottom') != null) { document.getElementById('bottomT').value = frameData.getAttribute('bottom'); }
   if (frameData.getAttribute('narrow') == 'true') { document.getElementById('narrowFrame').checked = true; } else { document.getElementById('narrowFrame').checked = false; }
-  if (frameData.getAttribute('alttext') != null) { document.getElementById('altText').value = frameData.getAttribute('alttext'); }
-  if (frameData.getAttribute('altt') != null) { document.getElementById('altT').value = frameData.getAttribute('altt'); }
+  const operandData = frameData.getElementsByTagName('operand');
+  populateExtraOperands(operandData);
+  //if (frameData.getAttribute('alttext') != null) { document.getElementById('altText').value = frameData.getAttribute('alttext'); }
+  //if (frameData.getAttribute('altt') != null) { document.getElementById('altT').value = frameData.getAttribute('altt'); }
   document.getElementById('deleteFrameDialogBtn').removeAttribute('hidden');
   disableApplyFrameDialog();
+}
+
+function populateExtraOperands(operandData) {
+  const operandList = document.querySelectorAll('.operandRow');
+  for (i = 0; i < operandList.length; i++) {
+    operandList[i].remove();
+  }
+  const operandTableBody =  document.getElementById('operandRows');
+  if (operandData.length  > 1) {
+    document.getElementById('operands').style.display = 'inline-block';
+    // N.B we ignore 1st operand in loop below
+    for (i = 1; i < operandData.length; i++) {
+      const operandRowId = 'operand_' + i;
+      const delOpBtnId = 'delOpBtnRow_' + i;;
+      operandTableBody.insertAdjacentHTML('beforeend', '<tr id="' + operandRowId +'" class="operandRow"><td>' + operandData[i].getAttribute('t') + '</td><td>' + operandData[i].textContent + '</td><td><button id ="'+ delOpBtnId + '" class="delOperand" value="' + i + '">-&nbsp;</button></td></tr>');
+      document.getElementById(delOpBtnId).addEventListener("click", removeOperand, false);
+    }
+  } else {
+    document.getElementById('operands').style.display = 'none';
+  }
+  document.getElementById('newOperandT').value = '';
+  document.getElementById('newOperandText').value = '';
+}
+
+function removeOperand(event) {
+    const operandId = 'operand_' + event.target.value;
+    document.getElementById(operandId).remove();
+    enableApplyFrameDialog();
 }
 
 function hideFrameDialog() {
@@ -681,16 +714,6 @@ function bbarInput(event) {
   enableApplyLifelineDialog();
 }
 
-function toggleNewActBar(event) {
-  if(event.currentTarget.checked == true)
-  {
-    document.getElementById('newActBar').style.display = "inline-block";
-  } else {
-    document.getElementById('newActBar').style.display = "none";
-  }
-  //enableApplyLifelineDialog();
-}
-
 function toggleFiniteVisibility(event) {
   if(event.currentTarget.checked == true)
   {
@@ -700,6 +723,16 @@ function toggleFiniteVisibility(event) {
     enableApplyLifelineDialog();
   }
 }
+
+/*function toggleNewOperandVisibility(event) {
+  if(event.currentTarget.checked == true)
+  {
+    document.getElementById('newOperand').style.display = "inline-block";
+  } else {
+    document.getElementById('newOperand').style.display = "none";
+    enableApplyFrameDialog();
+  }
+}*/
 
 function messageTypeTailorDialogHandler(event) {
   messageTypeTailorDialog(event.currentTarget.value);
@@ -734,17 +767,22 @@ function frameTypeTailorDialog(frameType) {
     case 'SD':
       document.getElementById('sd-div').style.display = "inline-block";
       document.getElementById('non-sd-div').style.display = "none";
-      document.getElementById('alt-div').style.display = "none";
+      //document.getElementById('alt-div').style.display = "none";
+      document.getElementById('operands').style.display = "none";
       break;
     case 'ALT':
+    case 'SEQ':
+    case 'PAR':
       document.getElementById('sd-div').style.display = "none";
       document.getElementById('non-sd-div').style.display = "inline-block";
-      document.getElementById('alt-div').style.display = "inline-block";
+      //document.getElementById('alt-div').style.display = "inline-block";
+      document.getElementById('operands').style.display = "inline-block";
       break;
     default:
       document.getElementById('sd-div').style.display = "none";
       document.getElementById('non-sd-div').style.display = "inline-block";
-      document.getElementById('alt-div').style.display = "none";
+      //document.getElementById('alt-div').style.display = "none";
+      document.getElementById('operands').style.display = "none";
   }
   enableApplyFrameDialog();
 }
@@ -758,7 +796,6 @@ function toggleResponseVisibility(event) {
   }
   enableApplyMessageDialog();
 }
-
 
 function tValueInput(event) {
   const rtValue = document.getElementById('rtValue');
@@ -776,12 +813,6 @@ function topTInput(event) {
   bottomTValue.setAttribute('min', bottomTMinValue);
   if (bottomTValue.value < bottomTMinValue) {
     bottomTValue.value = bottomTMinValue;
-  }
-  const altTValue = document.getElementById('altT');
-  const altTMinValue = parseInt(event.currentTarget.value) + 1;
-  altTValue.setAttribute('min', altTMinValue);
-  if (altTValue.value < altTMinValue) {
-    altTValue.value = altTMinValue;
   }
   enableApplyFrameDialog();
 }
@@ -803,7 +834,6 @@ function updateLifeline() {
 
   const newActivityBars = xmlDoc.createElement('activitybars');
   const barList = document.querySelectorAll('.barRow');
-  outerLoop:
   for (let i = 0; i < barList.length; i++) {
     const activityBar = xmlDoc.createElement('activitybar');
     const begin_tValue = barList[i].firstChild.textContent;
@@ -812,14 +842,15 @@ function updateLifeline() {
     activityBar.setAttribute('end_t', end_tValue);
     newActivityBars.appendChild(activityBar);
   }
-  // add new bar here
+  // add new bar here - need to validate bbar value is a number
   let inserted = false;
-  if (document.getElementById('showNewActBar').checked) {
+  const newBegin_tValue = parseInt(document.getElementById('bbar').value);
+  if (Number.isInteger(newBegin_tValue)) {
     const newActivityBar = xmlDoc.createElement('activitybar');
-    const newBegin_tValue = parseInt(document.getElementById('bbar').value);
     const newEnd_tValue = parseInt(document.getElementById('ebar').value);
     newActivityBar.setAttribute('begin_t', newBegin_tValue);
     newActivityBar.setAttribute('end_t', newEnd_tValue);
+    // all child nodes are of type activity bar
     for (let j = 0; j < newActivityBars.childNodes.length; j++) {
       if (newBegin_tValue < parseInt(newActivityBars.childNodes[j].getAttribute('begin_t'))) {
         newActivityBars.insertBefore(newActivityBar, newActivityBars.children[j]);
@@ -842,7 +873,7 @@ function updateLifeline() {
     // append if new.
     lifelineList.appendChild(newElement);
     // update Idx hidden text field
-    lifelineIdx.value = lifelineList.childNodes.length - 1;
+    lifelineIdx.value = lifelineList.getElementsByTagName("lifeline").length - 1;
   } else {
     // replace if existing
     theOldLifeline = lifelineList.getElementsByTagName('lifeline')[lifelineIdx.value];
@@ -850,7 +881,7 @@ function updateLifeline() {
   }
   const lifelineData = theSourceDoc.dom.getElementsByTagName('lifeline')[lifelineIdx.value]
   const barData = lifelineData.getElementsByTagName('activitybars')[0].getElementsByTagName('activitybar');
-  resetActivityBars(barData);
+  populateActivityBars(barData);
   theSourceDoc.isModified = true;
   populateUi();
   disableApplyLifelineDialog();
@@ -947,23 +978,59 @@ function updateFrame() {
   let xmlDoc = document.implementation.createDocument("", "", null);
   let newElement = xmlDoc.createElement('frame');
   const frameTextValue = document.getElementById('frameText').value;
-  const newFrameTextNode = xmlDoc.createTextNode(frameTextValue);
-  newElement.appendChild(newFrameTextNode);
+  const firstOperandTextNode = xmlDoc.createTextNode(frameTextValue);
+  const firstOperand = xmlDoc.createElement('operand');
+  firstOperand.setAttribute('t', document.getElementById('topT').value);
+  firstOperand.appendChild(firstOperandTextNode);
+  newElement.appendChild(firstOperand);
+
   const typeAttr = document.getElementById('frameType').value;
   newElement.setAttribute('type', typeAttr);
-  if (typeAttr == 'SD') {
-    newElement.setAttribute('widthfactor', document.getElementById('textWidth').value);
-  } else {
-    newElement.setAttribute('left', document.getElementById('leftLifeline').value);
-    newElement.setAttribute('right', document.getElementById('rightLifeline').value);
-    newElement.setAttribute('top', document.getElementById('topT').value);
-    newElement.setAttribute('bottom', document.getElementById('bottomT').value);
+  switch (typeAttr) {
+    case 'SD':
+      newElement.setAttribute('widthfactor', document.getElementById('textWidth').value);
+      break;
+    case 'ALT':
+    case 'SEQ':
+    case 'PAR':
+      // add any extra operands (first operand already added above)
+      const operandList = document.querySelectorAll('.operandRow');
+      for (let i = 0; i < operandList.length; i++) {
+        const myOperand = xmlDoc.createElement('operand');
+        const tValue = operandList[i].firstChild.textContent;
+        const operandText = operandList[i].children[1].textContent;
+        const operandTextNode = xmlDoc.createTextNode(operandText);
+        myOperand.setAttribute('t', tValue);
+        myOperand.appendChild(operandTextNode);
+        newElement.appendChild(myOperand);
+      }
+      // is there a new operand to add?
+      let inserted = false;
+      const newOperandTValue = parseInt(document.getElementById('newOperandT').value);
+      if (Number.isInteger(newOperandTValue)) {
+        const newOperand = xmlDoc.createElement('operand');
+        newOperand.setAttribute('t', newOperandTValue);
+        const newOperandText = document.getElementById('newOperandText').value;
+        const newOperandTextNode = xmlDoc.createTextNode(newOperandText);
+        newOperand.appendChild(newOperandTextNode);
+        for (let j = 0; j < newElement.childNodes.length; j++) {
+          if (newOperandTValue < parseInt(newElement.childNodes[j].getAttribute('t'))) {
+            newElement.insertBefore(newOperand, newElement.children[j]);
+            inserted = true;
+            break
+          }
+        }
+        if (inserted == false) {
+          newElement.appendChild(newOperand);
+        }
+      }
+    default:
+      newElement.setAttribute('left', document.getElementById('leftLifeline').value);
+      newElement.setAttribute('right', document.getElementById('rightLifeline').value);
+      newElement.setAttribute('top', document.getElementById('topT').value);
+      newElement.setAttribute('bottom', document.getElementById('bottomT').value);
   }
-  if (typeAttr == 'ALT') {
-    newElement.setAttribute('alttext', document.getElementById('altText').value);
-    newElement.setAttribute('altt', document.getElementById('altT').value);
-  }
-  if (document.getElementById('narrowFrame').checked = true) {
+  if (document.getElementById('narrowFrame').checked == true) {
     newElement.setAttribute('narrow', 'true');
   }
   const frameIdx = document.getElementById('frameIdx');
@@ -978,6 +1045,9 @@ function updateFrame() {
     theOldFrame = frameList.getElementsByTagName('frame')[frameIdx.value];
     frameList.replaceChild(newElement, theOldFrame);
   }
+  const frameData = theSourceDoc.dom.getElementsByTagName('frame')[frameIdx.value]
+  const operandData = frameData.getElementsByTagName('operand');
+  populateExtraOperands(operandData);
   theSourceDoc.isModified = true;
   populateUi();
   disableApplyFrameDialog();
@@ -1120,8 +1190,6 @@ document.onreadystatechange = () => {
     okDialog.addEventListener('click', okLifeline);
     const deleteDialog = document.getElementById('deleteLifelineDialogBtn');
     deleteDialog.addEventListener('click', deleteLifeline);
-    const showNewActBar = document.getElementById('showNewActBar');
-    showNewActBar.addEventListener('click', toggleNewActBar);
     const bbar = document.getElementById('bbar');
     bbar.addEventListener('input', bbarInput);
     const showFinite = document.getElementById('showFiniteLifeline');
@@ -1172,14 +1240,16 @@ document.onreadystatechange = () => {
     rghtLifeline.addEventListener('change', enableApplyFrameDialog);
 
     const topT = document.getElementById('topT');
-    //topT.addEventListener('change', enableApplyFrameDialog);
     topT.addEventListener('input', topTInput);
-    const bottomT = document.getElementById('bottomT');
-    bottomT.addEventListener('change', enableApplyFrameDialog);
-    const altText = document.getElementById('altText');
+    //const bottomT = document.getElementById('bottomT');
+
+    //const showNewOperand = document.getElementById('showNewOperand');
+    //showNewOperand.addEventListener('click', toggleNewOperandVisibility);
+
+    /*const altText = document.getElementById('altText');
     altText.addEventListener('change', enableApplyFrameDialog);
     const altT = document.getElementById('altT');
-    altT.addEventListener('change', enableApplyFrameDialog);
+    altT.addEventListener('change', enableApplyFrameDialog); */
     const hideFDialog = document.getElementById('cancelFrameDialogBtn');
     hideFDialog.addEventListener('click', hideFrameDialog);
     const frameType = document.getElementById('frameType');

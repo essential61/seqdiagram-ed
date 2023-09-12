@@ -440,7 +440,7 @@
               <xsl:attribute name="style">font-weight: bold;</xsl:attribute>
               <xsl:value-of select="'SD '"/>
             </xsl:element>
-            <xsl:value-of select="./text()"/>
+            <xsl:value-of select="./operand[1]/text()"/>
           </xsl:element>
         </xsl:when>
         <xsl:otherwise>
@@ -475,7 +475,7 @@
             <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
-            <xsl:value-of select="./text()"/>
+            <xsl:value-of select="./operand[1]/text()"/>
           </xsl:element>
           <xsl:if test="@type = 'ALT'">
             <xsl:element name="line">
@@ -491,7 +491,7 @@
               <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
               <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
               <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
-              <xsl:value-of select="@alttext"/>
+              <xsl:value-of select="./operand[2]/text()"/>
             </xsl:element>
           </xsl:if>
         </xsl:otherwise>

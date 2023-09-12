@@ -81,7 +81,7 @@
       <label for="lifelineName">Lifeline Name:</label>
       <textarea id="lifelineName" placeholder="enter text here" rows="2"></textarea>
     </p>
-    <div id="existingActBars" class="initially-hidden">
+    <div id="existingActBars" class="initially-hidden" style="width: 100%;">
       <span  style="display: inline-block;width: 130px; text-align: right;">Activity Bars:</span>
       <table id="activityBars">
         <thead>
@@ -90,23 +90,14 @@
         <tbody id="activityBarsRows">
         </tbody>
       </table>
-    </div>
-    <p>
-    <label for="showNewActBar">New Activity Bar?</label>
-    <input type="checkbox" id="showNewActBar" name="showNewActBar"/>
-
-    <div id="newActBar" class="initially-hidden">
       <span style="display: inline-block;width: 130px; text-align: right;">new bar:</span>
       <table>
-        <thead>
-          <tr><td style="width: 8ch;">begin t</td><td style="width: 8ch;">end t</td><td></td></tr>
-        </thead>
+        <thead/>
         <tbody>
           <tr><td><input id="bbar" type="number" min="1" style="width: 8ch;"></td><td><input id="ebar" type="number" min="1" style="width: 8ch;"></td></tr>
         </tbody>
       </table>
     </div>
-    </p>
     <p>
     <label for="showFiniteLifeline">Finite lifeline?</label>
     <input type="checkbox" id="showFiniteLifeline" name="showFiniteLifeline"/>
@@ -230,7 +221,28 @@
       <label for="narrowFrame">Narrow:</label>
       <input type="checkbox" id="narrowFrame" name="narrowFrame"/>
     </p>
-    <div id="alt-div" class="initially-hidden">
+    <div id="operands" class="initially-hidden" style="width: 100%;">
+      <span  style="display: inline-block; width: 130px; text-align: right;">Extra Operands:</span>
+      <table id="operandTable">
+        <thead>
+          <tr><td style="width: 5ch;">t</td><td style="width: 200px;">text</td><td></td></tr>
+        </thead>
+        <tbody id="operandRows">
+        </tbody>
+      </table>
+    <!--</div>
+    <div id="newOperand" class="initially-hidden" style="width: 100%;"> -->
+      <span style="display: inline-block; width: 130px; text-align: right;">new operand:</span>
+      <table>
+        <thead/>
+        <tbody>
+          <tr><td><input id="newOperandT" type="number" min="1" style="width: 5ch;"></td><td><input id="newOperandText" style="width: 200px;"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+<!--    <div id="alt-div" class="initially-hidden">
     <p>
       <label for="altText">Alt Condition Text:</label>
       <input id="altText" type="text" placeholder="Enter alt condition">
@@ -240,7 +252,7 @@
       <input name="altT" id="altT" type="number" min="1" style="width: 5ch;">
     </p>
     </div>
-    <p>
+    <p>-->
     <menu>
       <button id="cancelFrameDialogBtn" value="cancel">Quit</button>
       <button id="applyFrameDialogBtn" value="default">Apply</button>
