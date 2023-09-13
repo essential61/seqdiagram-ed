@@ -450,6 +450,7 @@
               <xsl:otherwise>0.25</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
+          <xsl:variable name="OPTEXTX"><xsl:value-of select="($HSPACING  * (@left - $FRAMEPADDING)) + 90"/></xsl:variable>
           <xsl:element name="rect">
             <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
@@ -470,32 +471,43 @@
             <xsl:value-of select="@type"/>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * @left) + 30"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$OPTEXTX"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 15"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
             <xsl:value-of select="./operand[1]/text()"/>
           </xsl:element>
-          <xsl:if test="@type = 'ALT'">
-            <xsl:element name="line">
-              <xsl:attribute name="x1"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
-              <xsl:attribute name="y1"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
-              <xsl:attribute name="x2"><xsl:value-of select="$HSPACING * (@right + $FRAMEPADDING)"/></xsl:attribute>
-              <xsl:attribute name="y2"><xsl:value-of select="@altt * $VSPACING"/></xsl:attribute>
-              <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
-            </xsl:element>
-            <xsl:element name="text">
-              <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * @left) + 30"/></xsl:attribute>
-              <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @altt) + 5"/></xsl:attribute>
-              <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
-              <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
-              <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
-              <xsl:value-of select="./operand[2]/text()"/>
-            </xsl:element>
+          <xsl:if test="@type = 'ALT' or @type = 'SEQ' or @type = 'PAR'">
+            <xsl:apply-templates select="operand[count(preceding-sibling::operand) &gt; 0]">
+               <xsl:with-param name="X1POS" select="$HSPACING  * (@left - $FRAMEPADDING)"/>
+               <xsl:with-param name="X2POS" select="$HSPACING  * (@right + $FRAMEPADDING)"/>
+               <xsl:with-param name="TEXTX" select="$OPTEXTX"/>
+            </xsl:apply-templates>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="operand">
+    <xsl:param name="X1POS"/>
+    <xsl:param name="X2POS"/>
+    <xsl:param name="TEXTX"/>
+    <xsl:element name="line">
+      <xsl:attribute name="x1"><xsl:value-of select="$X1POS"/></xsl:attribute>
+      <xsl:attribute name="y1"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
+      <xsl:attribute name="x2"><xsl:value-of select="$X2POS"/></xsl:attribute>
+      <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
+      <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+    </xsl:element>
+    <xsl:element name="text">
+      <xsl:attribute name="x"><xsl:value-of select="$TEXTX"/></xsl:attribute>
+      <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @t) + 5"/></xsl:attribute>
+      <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+      <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
+      <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
+      <xsl:value-of select="text()"/>
     </xsl:element>
   </xsl:template>
 

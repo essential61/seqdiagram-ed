@@ -131,7 +131,7 @@ function loadExampleDocument() {
         <frame type="SD" widthfactor="1">
             <operand>Example Diagram</operand>
         </frame>
-        <frame type="ALT" left="1" right="2" top="5" bottom="14" alttext="[else]" altt="10">
+        <frame type="ALT" left="1" right="2" top="5" bottom="14">
             <operand t="5">[condition x]</operand>
             <operand t="10">[else]</operand>
         </frame>
@@ -602,7 +602,9 @@ function resetFrameDialog() {
 
   document.getElementById('newOperandT').value = '';
   document.getElementById('newOperandText').value = '';
-
+  document.getElementById('sd-div').style.display = 'none';
+  document.getElementById('non-sd-div').style.display = 'none';
+  document.getElementById('operands').style.display = 'none';
   disableApplyFrameDialog();
 }
 
@@ -623,8 +625,6 @@ function populateFrameDialog(frameIdx) {
   if (frameData.getAttribute('narrow') == 'true') { document.getElementById('narrowFrame').checked = true; } else { document.getElementById('narrowFrame').checked = false; }
   const operandData = frameData.getElementsByTagName('operand');
   populateExtraOperands(operandData);
-  //if (frameData.getAttribute('alttext') != null) { document.getElementById('altText').value = frameData.getAttribute('alttext'); }
-  //if (frameData.getAttribute('altt') != null) { document.getElementById('altT').value = frameData.getAttribute('altt'); }
   document.getElementById('deleteFrameDialogBtn').removeAttribute('hidden');
   disableApplyFrameDialog();
 }
@@ -724,16 +724,6 @@ function toggleFiniteVisibility(event) {
   }
 }
 
-/*function toggleNewOperandVisibility(event) {
-  if(event.currentTarget.checked == true)
-  {
-    document.getElementById('newOperand').style.display = "inline-block";
-  } else {
-    document.getElementById('newOperand').style.display = "none";
-    enableApplyFrameDialog();
-  }
-}*/
-
 function messageTypeTailorDialogHandler(event) {
   messageTypeTailorDialog(event.currentTarget.value);
 }
@@ -767,7 +757,6 @@ function frameTypeTailorDialog(frameType) {
     case 'SD':
       document.getElementById('sd-div').style.display = "inline-block";
       document.getElementById('non-sd-div').style.display = "none";
-      //document.getElementById('alt-div').style.display = "none";
       document.getElementById('operands').style.display = "none";
       break;
     case 'ALT':
@@ -775,13 +764,11 @@ function frameTypeTailorDialog(frameType) {
     case 'PAR':
       document.getElementById('sd-div').style.display = "none";
       document.getElementById('non-sd-div').style.display = "inline-block";
-      //document.getElementById('alt-div').style.display = "inline-block";
       document.getElementById('operands').style.display = "inline-block";
       break;
     default:
       document.getElementById('sd-div').style.display = "none";
       document.getElementById('non-sd-div').style.display = "inline-block";
-      //document.getElementById('alt-div').style.display = "none";
       document.getElementById('operands').style.display = "none";
   }
   enableApplyFrameDialog();
@@ -811,6 +798,8 @@ function topTInput(event) {
   const bottomTValue = document.getElementById('bottomT');
   const bottomTMinValue = parseInt(event.currentTarget.value) + 2;
   bottomTValue.setAttribute('min', bottomTMinValue);
+  const newOperandT = document.getElementById('newOperandT');
+  newOperandT.setAttribute('min', bottomTMinValue);
   if (bottomTValue.value < bottomTMinValue) {
     bottomTValue.value = bottomTMinValue;
   }
@@ -1173,7 +1162,6 @@ document.onreadystatechange = () => {
     const layoutDialogHeader = document.getElementById('layoutDialogHeader');
     layoutDialogHeader.addEventListener('mousedown', startDragging);
 
-
     const lifelines = document.getElementById('lifelines');
     lifelines.addEventListener('click', showLifelineDialogSelect);
     const lifelineDialogHeader = document.getElementById('lifelineDialogHeader');
@@ -1192,10 +1180,12 @@ document.onreadystatechange = () => {
     deleteDialog.addEventListener('click', deleteLifeline);
     const bbar = document.getElementById('bbar');
     bbar.addEventListener('input', bbarInput);
+    const ebar = document.getElementById('ebar');
+    ebar.addEventListener('input', enableApplyLifelineDialog);
     const showFinite = document.getElementById('showFiniteLifeline');
     showFinite.addEventListener('click', toggleFiniteVisibility);
     const destroyT = document.getElementById('destroyT');
-    destroyT.addEventListener('change', enableApplyLifelineDialog);
+    destroyT.addEventListener('input', enableApplyLifelineDialog);
 
     const messages = document.getElementById('messages');
     messages.addEventListener('click', showMessageDialogSelect);
@@ -1241,15 +1231,12 @@ document.onreadystatechange = () => {
 
     const topT = document.getElementById('topT');
     topT.addEventListener('input', topTInput);
-    //const bottomT = document.getElementById('bottomT');
-
-    //const showNewOperand = document.getElementById('showNewOperand');
-    //showNewOperand.addEventListener('click', toggleNewOperandVisibility);
-
-    /*const altText = document.getElementById('altText');
-    altText.addEventListener('change', enableApplyFrameDialog);
-    const altT = document.getElementById('altT');
-    altT.addEventListener('change', enableApplyFrameDialog); */
+    const bottomT = document.getElementById('bottomT');
+    bottomT.addEventListener('input', enableApplyFrameDialog);
+    const narrowFrame = document.getElementById('narrowFrame');
+    narrowFrame.addEventListener('change', enableApplyFrameDialog);
+    const newOperandT = document.getElementById('newOperandT');
+    newOperandT.addEventListener('change', enableApplyFrameDialog);
     const hideFDialog = document.getElementById('cancelFrameDialogBtn');
     hideFDialog.addEventListener('click', hideFrameDialog);
     const frameType = document.getElementById('frameType');
