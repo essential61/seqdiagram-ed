@@ -37,47 +37,52 @@
           <line x1="0" y1="0" x2="10" y2="3.5" style="stroke:black;"/>
           <line x1="0" y1="7" x2="10" y2="3.5" style="stroke:black;"/>
         </marker>
-        <symbol id="object-rect" style="stroke: black; fill: none; stroke-width: 2;">
+        <symbol id="object-rect" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
           <xsl:element name="rect">
-            <xsl:attribute name="x"><xsl:value-of select="$HSPACING * 0.6"/></xsl:attribute>
-            <xsl:attribute name="y">1</xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$HSPACING * -0.4"/></xsl:attribute>
+            <xsl:attribute name="y">5</xsl:attribute>
             <xsl:attribute name="width"><xsl:value-of select="$HSPACING * 0.8"/></xsl:attribute>
-            <xsl:attribute name="height">100</xsl:attribute>
+            <xsl:attribute name="height">90</xsl:attribute>
+          </xsl:element>
+        </symbol>
+        <symbol id="active-object-rect" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+          <use href="#object-rect" width="400" height="100" x="-200" y="0"/>
+          <xsl:element name="line">
+            <xsl:attribute name="x1"><xsl:value-of select="($HSPACING * -0.4) + 10"/></xsl:attribute>
+            <xsl:attribute name="y1">5</xsl:attribute>
+            <xsl:attribute name="x2"><xsl:value-of select="($HSPACING * -0.4) + 10"/></xsl:attribute>
+            <xsl:attribute name="y2">95</xsl:attribute>
+          </xsl:element>
+          <xsl:element name="line">
+            <xsl:attribute name="x1"><xsl:value-of select="($HSPACING * 0.4) - 10"/></xsl:attribute>
+            <xsl:attribute name="y1">5</xsl:attribute>
+            <xsl:attribute name="x2"><xsl:value-of select="($HSPACING * 0.4) - 10"/></xsl:attribute>
+            <xsl:attribute name="y2">95</xsl:attribute>
           </xsl:element>
         </symbol>
         <symbol id="frame-polygon" style="stroke: black; fill: white; stroke-width: 2;">
           <polygon points="0,0 80,0 80,15 70,30 0,30"/>
         </symbol>
-        <symbol id="actor" style="stroke: black; fill: none; stroke-width: 2;">
-          <xsl:element name="circle">
-            <xsl:attribute name="cx"><xsl:value-of select="$HSPACING"/></xsl:attribute>
-            <xsl:attribute name="cy">20</xsl:attribute>
-            <xsl:attribute name="r">10</xsl:attribute>
-          </xsl:element>
-          <xsl:element name="line">
-            <xsl:attribute name="x1"><xsl:value-of select="$HSPACING"/></xsl:attribute>
-            <xsl:attribute name="y1">30</xsl:attribute>
-            <xsl:attribute name="x2"><xsl:value-of select="$HSPACING"/></xsl:attribute>
-            <xsl:attribute name="y2">55</xsl:attribute>
-          </xsl:element>
-          <xsl:element name="line">
-            <xsl:attribute name="x1"><xsl:value-of select="$HSPACING - 15"/></xsl:attribute>
-            <xsl:attribute name="y1">35</xsl:attribute>
-            <xsl:attribute name="x2"><xsl:value-of select="$HSPACING + 15"/></xsl:attribute>
-            <xsl:attribute name="y2">35</xsl:attribute>
-          </xsl:element>
-          <xsl:element name="line">
-            <xsl:attribute name="x1"><xsl:value-of select="$HSPACING"/></xsl:attribute>
-            <xsl:attribute name="y1">55</xsl:attribute>
-            <xsl:attribute name="x2"><xsl:value-of select="$HSPACING - 15"/></xsl:attribute>
-            <xsl:attribute name="y2">75</xsl:attribute>
-          </xsl:element>
-          <xsl:element name="line">
-            <xsl:attribute name="x1"><xsl:value-of select="$HSPACING"/></xsl:attribute>
-            <xsl:attribute name="y1">55</xsl:attribute>
-            <xsl:attribute name="x2"><xsl:value-of select="$HSPACING + 15"/></xsl:attribute>
-            <xsl:attribute name="y2">75</xsl:attribute>
-          </xsl:element>
+        <symbol id="actor" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+          <circle cx="0" cy="20" r="10"/>
+          <line x1="0" y1="30" x2="0" y2="55"/>
+          <line x1="-15" y1="35" x2="15" y2="35"/>
+          <line x1="0" y1="55" x2="-15" y2="75"/>
+          <line x1="0" y1="55" x2="15" y2="75"/>
+        </symbol>
+        <symbol id="boundary" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+          <circle cx="0" cy="40" r="35"/>
+          <line x1="-35" y1="40" x2="-60" y2="40"/>
+          <line x1="-60" y1="5" x2="-60" y2="75"/>
+        </symbol>
+        <symbol id="entity" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+          <circle cx="0" cy="40" r="35"/>
+          <line x1="-35" y1="75" x2="35" y2="75"/>
+        </symbol>
+        <symbol id="control" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+          <circle cx="0" cy="40" r="35"/>
+          <line x1="0" y1="5" x2="5" y2="0"/>
+          <line x1="0" y1="5" x2="5" y2="10"/>
         </symbol>
         <symbol id="reflexive" style="stroke: black; fill: none; stroke-width: 2;">
           <xsl:element name="line">
@@ -107,9 +112,9 @@
             <xsl:attribute name="visibility">hidden</xsl:attribute>
           </xsl:element>
         </symbol>
-        <symbol id="destroy-symbol" width="20" height="20" style="stroke: black; fill: none; stroke-width: 4;" viewBox="0 0 20 20">
-          <line x1="0" y1="0" x2="20" y2="20"/>
-          <line x1="20" y1="0" x2="0" y2="20"/>
+        <symbol id="destroy-symbol" style="stroke: black; fill: none; stroke-width: 4;" viewBox="-10 -10 20 20">
+          <line x1="-10" y1="-10" x2="10" y2="10"/>
+          <line x1="10" y1="-10" x2="-10" y2="10"/>
         </symbol>
         <filter x="0" y="0" width="1" height="1" id="textbg">
           <feFlood flood-color="white" result="bg" flood-opacity="0.6"/>
@@ -150,6 +155,10 @@
       <xsl:choose>
         <xsl:when test="@type = 'actor'"><xsl:value-of select="'#actor'"/></xsl:when>
         <xsl:when test="@type = 'object'"><xsl:value-of select="'#object-rect'"/></xsl:when>
+        <xsl:when test="@type = 'active-object'"><xsl:value-of select="'#active-object-rect'"/></xsl:when>
+        <xsl:when test="@type = 'boundary'"><xsl:value-of select="'#boundary'"/></xsl:when>
+        <xsl:when test="@type = 'entity'"><xsl:value-of select="'#entity'"/></xsl:when>
+        <xsl:when test="@type = 'control'"><xsl:value-of select="'#control'"/></xsl:when>
         <xsl:otherwise><xsl:value-of select="'#object-rect'"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -167,10 +176,10 @@
     </xsl:variable>
     <xsl:variable name="TEXTPOSITION">
       <xsl:choose>
-        <xsl:when test="(@type = 'actor') and ($CREATIONTIME = 0)"><xsl:value-of select="-10"/></xsl:when>
-        <xsl:when test="(@type = 'object') and ($CREATIONTIME = 0)"><xsl:value-of select="-70"/></xsl:when>
-        <xsl:when test="(@type = 'actor') and ($CREATIONTIME > 0)"><xsl:value-of select="($CREATIONTIME * $VSPACING)+40"/></xsl:when>
-        <xsl:when test="(@type = 'object') and ($CREATIONTIME > 0)"><xsl:value-of select="($CREATIONTIME * $VSPACING)-20"/></xsl:when>
+        <xsl:when test="(@type = 'actor' or @type = 'boundary' or @type = 'entity' or @type = 'control') and ($CREATIONTIME = 0)"><xsl:value-of select="-5"/></xsl:when>
+        <xsl:when test="(@type = 'object' or @type = 'active-object') and ($CREATIONTIME = 0)"><xsl:value-of select="-70"/></xsl:when>
+        <xsl:when test="(@type = 'actor' or @type = 'boundary' or @type = 'entity' or @type = 'control') and ($CREATIONTIME > 0)"><xsl:value-of select="($CREATIONTIME * $VSPACING) + 45"/></xsl:when>
+        <xsl:when test="(@type = 'object' or @type = 'active-object') and ($CREATIONTIME > 0)"><xsl:value-of select="($CREATIONTIME * $VSPACING)-20"/></xsl:when>
         <xsl:otherwise><xsl:value-of select="-70"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -192,8 +201,10 @@
       <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
       <xsl:element name="use">
         <xsl:attribute name="href"><xsl:value-of select="$HREF"/></xsl:attribute>
-        <xsl:attribute name="x"><xsl:value-of select="$HPOS - $HSPACING"/></xsl:attribute>
+        <xsl:attribute name="x"><xsl:value-of select="$HPOS - 200"/></xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$OBJECTY"/></xsl:attribute>
+        <xsl:attribute name="width">400</xsl:attribute>
+        <xsl:attribute name="height">100</xsl:attribute>
       </xsl:element>
       <xsl:element name="line">
         <xsl:attribute name="x1"><xsl:value-of select="$HPOS"/></xsl:attribute>
@@ -235,6 +246,8 @@
           <xsl:attribute name="href">#destroy-symbol</xsl:attribute>
           <xsl:attribute name="x"><xsl:value-of select="$HPOS - 10"/></xsl:attribute>
           <xsl:attribute name="y"><xsl:value-of select="$LIFELINEEND - 10"/></xsl:attribute>
+          <xsl:attribute name="width">20</xsl:attribute>
+          <xsl:attribute name="height">20</xsl:attribute>
         </xsl:element>
       </xsl:if>
     </xsl:element>
@@ -478,7 +491,7 @@
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
             <xsl:value-of select="./operand[1]/text()"/>
           </xsl:element>
-          <xsl:if test="@type = 'ALT' or @type = 'SEQ' or @type = 'PAR'">
+          <xsl:if test="@type = 'ALT' or @type = 'SEQ' or @type = 'PAR 'or @type = 'STRICT'">
             <xsl:apply-templates select="operand[count(preceding-sibling::operand) &gt; 0]">
                <xsl:with-param name="X1POS" select="$HSPACING  * (@left - $FRAMEPADDING)"/>
                <xsl:with-param name="X2POS" select="$HSPACING  * (@right + $FRAMEPADDING)"/>

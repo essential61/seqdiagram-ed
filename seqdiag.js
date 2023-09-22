@@ -762,6 +762,7 @@ function frameTypeTailorDialog(frameType) {
     case 'ALT':
     case 'SEQ':
     case 'PAR':
+    case 'STRICT':
       document.getElementById('sd-div').style.display = "none";
       document.getElementById('non-sd-div').style.display = "inline-block";
       document.getElementById('operands').style.display = "inline-block";
@@ -982,6 +983,7 @@ function updateFrame() {
     case 'ALT':
     case 'SEQ':
     case 'PAR':
+    case 'STRICT':
       // add any extra operands (first operand already added above)
       const operandList = document.querySelectorAll('.operandRow');
       for (let i = 0; i < operandList.length; i++) {

@@ -127,7 +127,7 @@ option {
   height: auto;
   min-height: 100% !important;
   flex: 1;
-  background-color:  #efefef;
+  background-color:  white;
   border: solid 1px grey;
 }
 
