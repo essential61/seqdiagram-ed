@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <xsl:param  name="SHOWSCALE" select="''"/>
   <xsl:param  name="SCALEFACTOR" select="1"/>
   <!-- invisible bounding rects to make it easier to click on lines -->
@@ -23,7 +23,7 @@
   <xsl:variable name="SVGHEIGHT" select="($VSPACING * ($MAXT + 1)) - $VOFFSET"/>
   <xsl:variable name="ACTIVITYBARWIDTH" select="20"/>
   <xsl:variable name="FONTSIZE" select="/sequencediagml/parameters/fontsize/text()"/>
-  <xsl:variable name="FONTSTRING" select="concat('font-size: ', $FONTSIZE, 'pt;')"/>
+  <xsl:variable name="FONTSTRING" select="concat('font-size: ', $FONTSIZE, 'pt; font-family: Arial, Helvetica, sans-serif;')"/>
   <xsl:template match="/">
     <xsl:element name="svg">
       <xsl:attribute name="width"><xsl:value-of select="$SVGWIDTH * $SCALEFACTOR"/></xsl:attribute>
@@ -33,11 +33,11 @@
         <marker id="arrowhead-solid" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
           <polygon points="0 0, 10 3.5, 0 7" />
         </marker>
-        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-          <line x1="0" y1="0" x2="10" y2="3.5" style="stroke:black;"/>
-          <line x1="0" y1="7" x2="10" y2="3.5" style="stroke:black;"/>
+        <marker id="arrowhead" markerWidth="10" style="stroke: black; stroke-width: 1;" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <line x1="0" y1="0" x2="10" y2="3.5"/>
+          <line x1="0" y1="7" x2="10" y2="3.5"/>
         </marker>
-        <symbol id="object-rect" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+        <symbol id="object-rect" style="fill: none;" viewBox="-200 0 400 100">
           <xsl:element name="rect">
             <xsl:attribute name="x"><xsl:value-of select="$HSPACING * -0.4"/></xsl:attribute>
             <xsl:attribute name="y">5</xsl:attribute>
@@ -45,8 +45,8 @@
             <xsl:attribute name="height">90</xsl:attribute>
           </xsl:element>
         </symbol>
-        <symbol id="active-object-rect" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
-          <use href="#object-rect" width="400" height="100" x="-200" y="0"/>
+        <symbol id="active-object-rect" style="fill: none;" viewBox="-200 0 400 100">
+          <use href="#object-rect" xlink:href="#object-rect" width="400" height="100" x="-200" y="0"/>
           <xsl:element name="line">
             <xsl:attribute name="x1"><xsl:value-of select="($HSPACING * -0.4) + 10"/></xsl:attribute>
             <xsl:attribute name="y1">5</xsl:attribute>
@@ -60,31 +60,31 @@
             <xsl:attribute name="y2">95</xsl:attribute>
           </xsl:element>
         </symbol>
-        <symbol id="frame-polygon" style="stroke: black; fill: white; stroke-width: 2;">
+        <symbol id="frame-polygon" style="fill: white;">
           <polygon points="0,0 80,0 80,15 70,30 0,30"/>
         </symbol>
-        <symbol id="actor" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+        <symbol id="actor" style="fill: none;" viewBox="-200 0 400 100">
           <circle cx="0" cy="20" r="10"/>
           <line x1="0" y1="30" x2="0" y2="55"/>
           <line x1="-15" y1="35" x2="15" y2="35"/>
           <line x1="0" y1="55" x2="-15" y2="75"/>
           <line x1="0" y1="55" x2="15" y2="75"/>
         </symbol>
-        <symbol id="boundary" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+        <symbol id="boundary" style="fill: none;" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="-35" y1="40" x2="-60" y2="40"/>
           <line x1="-60" y1="5" x2="-60" y2="75"/>
         </symbol>
-        <symbol id="entity" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+        <symbol id="entity" style="fill: none;" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="-35" y1="75" x2="35" y2="75"/>
         </symbol>
-        <symbol id="control" style="stroke: black; fill: none; stroke-width: 2;" viewBox="-200 0 400 100">
+        <symbol id="control" style="fill: none;" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="0" y1="5" x2="5" y2="0"/>
           <line x1="0" y1="5" x2="5" y2="10"/>
         </symbol>
-        <symbol id="reflexive" style="stroke: black; fill: none; stroke-width: 2;">
+        <symbol id="reflexive" style="fill: none;">
           <xsl:element name="line">
             <xsl:attribute name="x1">0</xsl:attribute>
             <xsl:attribute name="y1"><xsl:value-of select="$VSPACING"/></xsl:attribute>
@@ -112,7 +112,7 @@
             <xsl:attribute name="visibility">hidden</xsl:attribute>
           </xsl:element>
         </symbol>
-        <symbol id="destroy-symbol" style="stroke: black; fill: none; stroke-width: 4;" viewBox="-10 -10 20 20">
+        <symbol id="destroy-symbol" style="fill: none; stroke-width: 4;" viewBox="-10 -10 20 20">
           <line x1="-10" y1="-10" x2="10" y2="10"/>
           <line x1="10" y1="-10" x2="-10" y2="10"/>
         </symbol>
@@ -199,8 +199,11 @@
       <xsl:attribute name="id"><xsl:value-of select="concat('lifeline_', $LIFELINEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">all</xsl:attribute>
       <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
+      <xsl:attribute name="stroke">black</xsl:attribute>
+      <xsl:attribute name="stroke-width">2</xsl:attribute>
       <xsl:element name="use">
         <xsl:attribute name="href"><xsl:value-of select="$HREF"/></xsl:attribute>
+        <xsl:attribute name="xlink:href"><xsl:value-of select="$HREF"/></xsl:attribute>
         <xsl:attribute name="x"><xsl:value-of select="$HPOS - 200"/></xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$OBJECTY"/></xsl:attribute>
         <xsl:attribute name="width">400</xsl:attribute>
@@ -211,12 +214,12 @@
         <xsl:attribute name="y1"><xsl:value-of select="$LIFELINESTART"/></xsl:attribute>
         <xsl:attribute name="x2"><xsl:value-of select="$HPOS"/></xsl:attribute>
         <xsl:attribute name="y2"><xsl:value-of select="$LIFELINEEND"/></xsl:attribute>
-        <xsl:attribute name="style">stroke: black; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+        <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
       </xsl:element>
       <xsl:element name="text">
         <xsl:attribute name="x"><xsl:value-of select="$HPOS"/></xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$TEXTPOSITION"/></xsl:attribute>
-        <xsl:attribute name="style">text-anchor: middle;</xsl:attribute>
+        <xsl:attribute name="style">text-anchor: middle; stroke-width: 1;</xsl:attribute>
         <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
         <xsl:choose>
           <xsl:when test="contains(lifelinename/text(),'&#10;')">
@@ -238,12 +241,13 @@
           <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @begin_t"/></xsl:attribute>
           <xsl:attribute name="width"><xsl:value-of select="$ACTIVITYBARWIDTH"/></xsl:attribute>
           <xsl:attribute name="height"><xsl:value-of select="$VSPACING * (@end_t - @begin_t)"/></xsl:attribute>
-          <xsl:attribute name="style">stroke: black; fill: white; stroke-width: 2;</xsl:attribute>
+          <xsl:attribute name="style">fill: white;</xsl:attribute>
         </xsl:element>
       </xsl:for-each>
       <xsl:if test="@destroy_t &lt; $MAXT">
         <xsl:element name="use">
           <xsl:attribute name="href">#destroy-symbol</xsl:attribute>
+          <xsl:attribute name="xlink:href">#destroy-symbol</xsl:attribute>
           <xsl:attribute name="x"><xsl:value-of select="$HPOS - 10"/></xsl:attribute>
           <xsl:attribute name="y"><xsl:value-of select="$LIFELINEEND - 10"/></xsl:attribute>
           <xsl:attribute name="width">20</xsl:attribute>
@@ -297,16 +301,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="LINESTROKE">
-      <xsl:choose>
-        <xsl:when test="@type = 'create'">
-          <xsl:value-of select="'stroke: black; stroke-width: 2; stroke-dasharray: 5 5;'"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="'stroke:black;stroke-width:2;'"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
 
     <xsl:variable name="MESSAGEANCHOR"><xsl:value-of select="concat('text-anchor: ', substring('end;', 1 div (contains($MESSAGEOFFSET, '-'))), substring('start;', 1 div not(contains($MESSAGEOFFSET, '-'))))"/></xsl:variable>
     <xsl:variable name="RESPONSEANCHOR"><xsl:value-of select="concat('text-anchor: ', substring('start;', 1 div (contains($MESSAGEOFFSET, '-'))), substring('end;', 1 div not(contains($MESSAGEOFFSET, '-'))))"/></xsl:variable>
@@ -314,17 +308,20 @@
       <xsl:attribute name="id"><xsl:value-of select="concat('message_', $MESSAGEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">all</xsl:attribute>
       <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
+      <xsl:attribute name="stroke">black</xsl:attribute>
+      <xsl:attribute name="stroke-width">2</xsl:attribute>
       <xsl:choose>
         <xsl:when test="@type = 'reflexive'">
           <xsl:element name="use">
             <xsl:attribute name="href">#reflexive</xsl:attribute>
+            <xsl:attribute name="xlink:href">#reflexive</xsl:attribute>
             <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + ($ACTIVITYBARWIDTH div 2)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="((@t - 1) * $VSPACING)"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + $ACTIVITYBARWIDTH"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 6"/></xsl:attribute>
-            <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+            <xsl:attribute name="style">text-anchor: start; stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
             <xsl:choose>
               <xsl:when test="contains(messagetext/text(),'&#10;')">
@@ -346,13 +343,15 @@
             <xsl:attribute name="y1"><xsl:value-of select="(@t * $VSPACING)"/></xsl:attribute>
             <xsl:attribute name="x2"><xsl:value-of select="(@to * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
             <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
-            <xsl:attribute name="style"><xsl:value-of select="$LINESTROKE"/></xsl:attribute>
+            <xsl:if test="@type = 'create'">
+              <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
+            </xsl:if>
             <xsl:attribute name="marker-end"><xsl:value-of select="$ARROWTYPE"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + (2 * $MESSAGEOFFSET)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 6"/></xsl:attribute>
-            <xsl:attribute name="style"><xsl:value-of select="$MESSAGEANCHOR"/></xsl:attribute>
+            <xsl:attribute name="style"><xsl:value-of select="$MESSAGEANCHOR"/> stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
             <xsl:choose>
               <xsl:when test="contains(messagetext/text(),'&#10;')">
@@ -383,13 +382,13 @@
               <xsl:attribute name="y1"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
               <xsl:attribute name="x2"><xsl:value-of select="(@from * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
               <xsl:attribute name="y2"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
-              <xsl:attribute name="style">stroke: black; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+              <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
               <xsl:attribute name="marker-end"><xsl:value-of select="$ARROWTYPE"/></xsl:attribute>
             </xsl:element>
             <xsl:element name="text">
               <xsl:attribute name="x"><xsl:value-of select="(@to * $HSPACING) - (2 * $MESSAGEOFFSET)"/></xsl:attribute>
               <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 6"/></xsl:attribute>
-              <xsl:attribute name="style"><xsl:value-of select="$RESPONSEANCHOR"/></xsl:attribute>
+              <xsl:attribute name="style"><xsl:value-of select="$RESPONSEANCHOR"/> stroke-width: 1;</xsl:attribute>
               <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
               <xsl:choose>
                 <xsl:when test="contains(response/text(),'&#10;')">
@@ -425,6 +424,8 @@
       <xsl:attribute name="id"><xsl:value-of select="concat('frame_', $FRAMEIDX)"/></xsl:attribute>
       <xsl:attribute name="pointer-events">visiblePainted</xsl:attribute>
       <xsl:attribute name="style"><xsl:value-of select="$FONTSTRING"/></xsl:attribute>
+      <xsl:attribute name="stroke">black</xsl:attribute>
+      <xsl:attribute name="stroke-width">2</xsl:attribute>
       <xsl:choose>
         <xsl:when test="@type = 'SD'">
           <xsl:variable name="WIDTHFACTOR">
@@ -438,20 +439,20 @@
             <xsl:attribute name="y"><xsl:value-of select="$VOFFSET + 1"/></xsl:attribute>
             <xsl:attribute name="width"><xsl:value-of select="$SVGWIDTH - 2"/></xsl:attribute>
             <xsl:attribute name="height"><xsl:value-of select="$SVGHEIGHT - 2"/></xsl:attribute>
-            <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2;</xsl:attribute>
+            <xsl:attribute name="style">fill: none;</xsl:attribute>
           </xsl:element>
           <xsl:element name="polygon">
             <xsl:attribute name="points"><xsl:value-of select="concat(1 - ($HSPACING div 2), ',', $VOFFSET + 1, ' ', ($WIDTHFACTOR - 0.5) * $HSPACING, ',', $VOFFSET + 1, ' ', ($WIDTHFACTOR - 0.5) * $HSPACING, ',', $VOFFSET + 21, ' ', (($WIDTHFACTOR - 0.5) * $HSPACING) - 20, ',', $VOFFSET + 41,' ', 1 - ($HSPACING div 2), ',', $VOFFSET + 41)"/></xsl:attribute>
-            <xsl:attribute name="style">stroke: black; fill: white; stroke-width: 2;</xsl:attribute>
+            <xsl:attribute name="style">fill: white;</xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="10 - ($HSPACING div 2)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VOFFSET + 21"/></xsl:attribute>
-            <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+            <xsl:attribute name="style">text-anchor: start; stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
             <xsl:element name="tspan">
               <xsl:attribute name="style">font-weight: bold;</xsl:attribute>
-              <xsl:value-of select="'SD '"/>
+              <xsl:value-of select="'SD&#160;'"/>
             </xsl:element>
             <xsl:value-of select="./operand[1]/text()"/>
           </xsl:element>
@@ -469,24 +470,25 @@
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
             <xsl:attribute name="width"><xsl:value-of select="$HSPACING * (@right - @left + (2 * $FRAMEPADDING))"/></xsl:attribute>
             <xsl:attribute name="height"><xsl:value-of select="$VSPACING * (@bottom - @top)"/></xsl:attribute>
-            <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2;</xsl:attribute>
+            <xsl:attribute name="style">fill: none;</xsl:attribute>
           </xsl:element>
           <xsl:element name="use">
             <xsl:attribute name="href">#frame-polygon</xsl:attribute>
+            <xsl:attribute name="xlink:href">#frame-polygon</xsl:attribute>
             <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left - $FRAMEPADDING)) + 10"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 5"/></xsl:attribute>
-            <xsl:attribute name="style">text-anchor: start;font-weight: bold;</xsl:attribute>
+            <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
             <xsl:value-of select="@type"/>
           </xsl:element>
           <xsl:element name="text">
             <xsl:attribute name="x"><xsl:value-of select="$OPTEXTX"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 15"/></xsl:attribute>
-            <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+            <xsl:attribute name="style">text-anchor: start; stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">middle</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
             <xsl:value-of select="./operand[1]/text()"/>
@@ -512,12 +514,12 @@
       <xsl:attribute name="y1"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
       <xsl:attribute name="x2"><xsl:value-of select="$X2POS"/></xsl:attribute>
       <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
-      <xsl:attribute name="style">stroke: black; fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+      <xsl:attribute name="style">fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
     </xsl:element>
     <xsl:element name="text">
       <xsl:attribute name="x"><xsl:value-of select="$TEXTX"/></xsl:attribute>
       <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @t) + 5"/></xsl:attribute>
-      <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
+      <xsl:attribute name="style">text-anchor: start; stroke-width: 1;</xsl:attribute>
       <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
       <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
       <xsl:value-of select="text()"/>

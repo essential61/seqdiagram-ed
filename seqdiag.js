@@ -167,7 +167,7 @@ function tAxisShow(event) {
 }
 
 function updateScale(event) {
-  document.getElementById('scaleValue').innerText = (event.target.value * 100) + '%';
+  document.getElementById('scaleValue').innerText = Math.trunc(event.target.value * 100) + '%';
   populateUi();
 }
 
@@ -190,21 +190,24 @@ function populateUi() {
     if (document.getElementById('lifelineDialog').style.visibility == 'visible') {
       const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
       if (lifelineSvg != null) {
-        lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        //lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        lifelineSvg.setAttribute('stroke', 'blue');
       }
     }
     const messageIndex = document.getElementById('messageIdx')
     if (document.getElementById('messageDialog').style.visibility == 'visible') {
       const messageSvg = document.getElementById('message_' + messageIndex.value);
       if (messageSvg != null) {
-        messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        //messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        messageSvg.setAttribute('stroke', 'blue');
       }
     }
     const frameIndex = document.getElementById('frameIdx')
     if (document.getElementById('frameDialog').style.visibility == 'visible') {
       const frameSvg = document.getElementById('frame_' + frameIndex.value);
       if (frameSvg != null) {
-        frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        //frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+        frameSvg.setAttribute('stroke', 'blue');
       }
     }
 
@@ -382,7 +385,8 @@ function showLifelineDialog(lifelineIndex) {
   } else {
     populateLifelineDialog(lifelineIndex);
     const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex);
-    lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    //lifelineSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    lifelineSvg.setAttribute('stroke', 'blue');
   }
   document.getElementById('lifelineDialog').style.visibility = 'visible';
 }
@@ -457,7 +461,8 @@ function hideLifelineDialog() {
   const lifelineIndex = document.getElementById('lifelineIdx');
   const lifelineSvg = document.getElementById('lifeline_' + lifelineIndex.value);
   if (lifelineSvg != null) {
-    lifelineSvg.removeAttribute('filter');
+    //lifelineSvg.removeAttribute('filter');
+    lifelineSvg.setAttribute('stroke', 'black');
   }
 }
 
@@ -497,7 +502,8 @@ function showMessageDialog(messageIndex) {
   } else {
     populateMessageDialog(messageIndex);
     const messageSvg = document.getElementById('message_' + messageIndex);
-    messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    //messageSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    messageSvg.setAttribute('stroke', 'blue');
   }
   document.getElementById('messageDialog').style.visibility = 'visible';
 }
@@ -546,7 +552,8 @@ function hideMessageDialog() {
   //console.log(parseInt(messageIndex.value));
   const messageSvg = document.getElementById('message_' + messageIndex.value);
   if (messageSvg != null) {
-    messageSvg.removeAttribute('filter');
+    //messageSvg.removeAttribute('filter');
+    messageSvg.setAttribute('stroke', 'black');
   }
 }
 
@@ -583,7 +590,8 @@ function showFrameDialog(frameIndex) {
   } else {
     populateFrameDialog(frameIndex);
     const frameSvg = document.getElementById('frame_' + frameIndex);
-    frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    //frameSvg.setAttributeNS(null, 'filter', 'url(#dropshadow)');
+    frameSvg.setAttribute('stroke', 'blue');
   }
   document.getElementById('frameDialog').style.visibility = 'visible';
 }
@@ -662,7 +670,8 @@ function hideFrameDialog() {
   const frameIndex = document.getElementById('frameIdx');
   const frameSvg = document.getElementById('frame_' + frameIndex.value);
   if (frameSvg != null) {
-    frameSvg.removeAttribute('filter');
+    //frameSvg.removeAttribute('filter');
+    frameSvg.setAttribute('stroke', 'black');
   }
 }
 function enableApplyFrameDialog() {
@@ -703,8 +712,6 @@ function removeActivityBar(event) {
 }
 
 function bbarInput(event) {
-  //console.log('get here');
-  //console.log(event.currentTarget.value);
   const ebar = document.getElementById('ebar');
   const ebarMinValue = parseInt(event.currentTarget.value) + 1;
   ebar.setAttribute('min', ebarMinValue);
@@ -854,9 +861,6 @@ function updateLifeline() {
   }
 
   newElement.appendChild(newActivityBars);
-  //const s = new XMLSerializer();
-  //const content = s.serializeToString(newElement);
-  //console.log(content);
   const lifelineIdx = document.getElementById('lifelineIdx');
   const lifelineList = theSourceDoc.dom.getElementsByTagName("lifelinelist")[0];
   if (isNaN(parseInt(lifelineIdx.value))) {
