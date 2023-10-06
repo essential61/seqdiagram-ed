@@ -8,10 +8,16 @@
   <xsl:variable name="HSPACING" select="/sequencediagml/parameters/hspacing/text()"/>
   <!-- space between increments of t -->
   <xsl:variable name="VSPACING" select="/sequencediagml/parameters/vspacing/text()"/>
+  <xsl:variable name="SUMSPACINGFACTOR">
+      <xsl:call-template name="sumspacingfactor">
+        <xsl:with-param name="N"><xsl:value-of select="count(/sequencediagml/lifelinelist/lifeline)"/></xsl:with-param>
+        <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+      </xsl:call-template>
+  </xsl:variable>
   <xsl:variable name="SVGWIDTH">
     <xsl:choose>
       <xsl:when test="count(/sequencediagml/lifelinelist/lifeline) > 1">
-        <xsl:value-of select="$HSPACING * count(/sequencediagml/lifelinelist/lifeline)"/>
+        <xsl:value-of select="$HSPACING * ($SUMSPACINGFACTOR + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$HSPACING * 2"/>
@@ -145,12 +151,22 @@
           <xsl:with-param name="I"><xsl:value-of select="$MAXT"/></xsl:with-param>
         </xsl:call-template>
       </xsl:if>
+      <xsl:call-template name="sumspacingfactor">
+        <xsl:with-param name="N">3</xsl:with-param>
+        <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+      </xsl:call-template>
     </xsl:element>
   </xsl:template>
 
   <xsl:template match="lifeline">
     <xsl:variable name="LIFELINEIDX" select="count(preceding-sibling::lifeline)"/>
-    <xsl:variable name="HPOS" select="$LIFELINEIDX * $HSPACING"/>
+    <xsl:variable name="NSPACINGFACTOR">
+      <xsl:call-template name="sumspacingfactor">
+        <xsl:with-param name="N"><xsl:value-of select="$LIFELINEIDX + 1"/></xsl:with-param>
+        <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="HPOS" select="$NSPACINGFACTOR * $HSPACING"/>
     <xsl:variable name="HREF">
       <xsl:choose>
         <xsl:when test="@type = 'actor'"><xsl:value-of select="'#actor'"/></xsl:when>
@@ -259,6 +275,18 @@
 
   <xsl:template match="message">
     <xsl:variable name="MESSAGEIDX" select="count(preceding-sibling::message)"/>
+    <xsl:variable name="FROMXFACTOR">
+      <xsl:call-template name="sumspacingfactor">
+        <xsl:with-param name="N"><xsl:value-of select="@from + 1"/></xsl:with-param>
+        <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="TOXFACTOR">
+      <xsl:call-template name="sumspacingfactor">
+        <xsl:with-param name="N"><xsl:value-of select="@to + 1"/></xsl:with-param>
+        <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:variable name="MESSAGEOFFSET">
       <xsl:choose>
         <xsl:when test="@to > @from">
@@ -282,15 +310,15 @@
     <xsl:variable name="XBOUNDRECT">
       <xsl:choose>
         <xsl:when test="@to > @from">
-          <xsl:value-of select="(@from  * $HSPACING) + $MESSAGEOFFSET"/>
+          <xsl:value-of select="($FROMXFACTOR  * $HSPACING) + $MESSAGEOFFSET"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="(@to * $HSPACING) - $MESSAGEOFFSET"/>
+          <xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSET"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="ABSMESSAGEOFFSETS" select="($MESSAGEOFFSET + $MESSAGEOFFSETTO)*($MESSAGEOFFSET + $MESSAGEOFFSETTO >= 0) - ($MESSAGEOFFSET + $MESSAGEOFFSETTO)*($MESSAGEOFFSET + $MESSAGEOFFSETTO &lt; 0)"/>
-    <xsl:variable name="WIDTHBOUNDRECT" select="(((@from - @to)*((@from - @to) >=0) - (@from - @to)*((@from - @to) &lt; 0)) * $HSPACING) - $ABSMESSAGEOFFSETS"/>
+    <xsl:variable name="WIDTHBOUNDRECT" select="((($FROMXFACTOR - $TOXFACTOR)*(($FROMXFACTOR - $TOXFACTOR) >=0) - ($FROMXFACTOR - $TOXFACTOR)*(($FROMXFACTOR - $TOXFACTOR) &lt; 0)) * $HSPACING) - $ABSMESSAGEOFFSETS"/>
     <xsl:variable name="ARROWTYPE">
       <xsl:choose>
         <xsl:when test="@type = 'asynchronous' or @type = 'create'">
@@ -315,11 +343,11 @@
           <xsl:element name="use">
             <xsl:attribute name="href">#reflexive</xsl:attribute>
             <xsl:attribute name="xlink:href">#reflexive</xsl:attribute>
-            <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + ($ACTIVITYBARWIDTH div 2)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + ($ACTIVITYBARWIDTH div 2)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="((@t - 1) * $VSPACING)"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + $ACTIVITYBARWIDTH"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $ACTIVITYBARWIDTH"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 6"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start; stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
@@ -327,7 +355,7 @@
               <xsl:when test="contains(messagetext/text(),'&#10;')">
                 <xsl:value-of select="substring-before(messagetext/text(), '&#10;')"/>
                 <xsl:call-template name="tspan">
-                <xsl:with-param name="XPOS" select="(@from * $HSPACING) + (2 * $MESSAGEOFFSET)"/>
+                <xsl:with-param name="XPOS" select="($FROMXFACTOR * $HSPACING) + (2 * $MESSAGEOFFSET)"/>
                   <xsl:with-param name="TEXT" select="substring-after(messagetext/text(), '&#10;')"/>
                 </xsl:call-template>
               </xsl:when>
@@ -339,9 +367,9 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:element name="line">
-            <xsl:attribute name="x1"><xsl:value-of select="(@from * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
+            <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
             <xsl:attribute name="y1"><xsl:value-of select="(@t * $VSPACING)"/></xsl:attribute>
-            <xsl:attribute name="x2"><xsl:value-of select="(@to * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
+            <xsl:attribute name="x2"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
             <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
             <xsl:if test="@type = 'create'">
               <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
@@ -349,7 +377,7 @@
             <xsl:attribute name="marker-end"><xsl:value-of select="$ARROWTYPE"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="(@from * $HSPACING) + (2 * $MESSAGEOFFSET)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + (2 * $MESSAGEOFFSET)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 6"/></xsl:attribute>
             <xsl:attribute name="style"><xsl:value-of select="$MESSAGEANCHOR"/> stroke-width: 1;</xsl:attribute>
             <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
@@ -357,7 +385,7 @@
               <xsl:when test="contains(messagetext/text(),'&#10;')">
                 <xsl:value-of select="substring-before(messagetext/text(), '&#10;')"/>
                 <xsl:call-template name="tspan">
-                <xsl:with-param name="XPOS" select="(@from * $HSPACING) + (2 * $MESSAGEOFFSET)"/>
+                <xsl:with-param name="XPOS" select="($FROMXFACTOR * $HSPACING) + (2 * $MESSAGEOFFSET)"/>
                   <xsl:with-param name="TEXT" select="substring-after(messagetext/text(), '&#10;')"/>
                 </xsl:call-template>
               </xsl:when>
@@ -378,15 +406,15 @@
 
           <xsl:if test="count(response)">
             <xsl:element name="line">
-              <xsl:attribute name="x1"><xsl:value-of select="(@to * $HSPACING) - $MESSAGEOFFSET"/></xsl:attribute>
+              <xsl:attribute name="x1"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSET"/></xsl:attribute>
               <xsl:attribute name="y1"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
-              <xsl:attribute name="x2"><xsl:value-of select="(@from * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
+              <xsl:attribute name="x2"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
               <xsl:attribute name="y2"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
               <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
               <xsl:attribute name="marker-end"><xsl:value-of select="$ARROWTYPE"/></xsl:attribute>
             </xsl:element>
             <xsl:element name="text">
-              <xsl:attribute name="x"><xsl:value-of select="(@to * $HSPACING) - (2 * $MESSAGEOFFSET)"/></xsl:attribute>
+              <xsl:attribute name="x"><xsl:value-of select="($TOXFACTOR * $HSPACING) - (2 * $MESSAGEOFFSET)"/></xsl:attribute>
               <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 6"/></xsl:attribute>
               <xsl:attribute name="style"><xsl:value-of select="$RESPONSEANCHOR"/> stroke-width: 1;</xsl:attribute>
               <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
@@ -394,7 +422,7 @@
                 <xsl:when test="contains(response/text(),'&#10;')">
                   <xsl:value-of select="substring-before(response/text(), '&#10;')"/>
                   <xsl:call-template name="tspan">
-                    <xsl:with-param name="XPOS" select="(@to * $HSPACING) - (2 * $MESSAGEOFFSET)"/>
+                    <xsl:with-param name="XPOS" select="($TOXFACTOR * $HSPACING) - (2 * $MESSAGEOFFSET)"/>
                     <xsl:with-param name="TEXT" select="substring-after(response/text(), '&#10;')"/>
                   </xsl:call-template>
                 </xsl:when>
@@ -464,22 +492,34 @@
               <xsl:otherwise>0.25</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          <xsl:variable name="OPTEXTX"><xsl:value-of select="($HSPACING  * (@left - $FRAMEPADDING)) + 90"/></xsl:variable>
+          <xsl:variable name="LEFTXFACTOR">
+            <xsl:call-template name="sumspacingfactor">
+              <xsl:with-param name="N"><xsl:value-of select="@left + 1"/></xsl:with-param>
+              <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="RIGHTXFACTOR">
+            <xsl:call-template name="sumspacingfactor">
+              <xsl:with-param name="N"><xsl:value-of select="@right + 1"/></xsl:with-param>
+              <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="OPTEXTX"><xsl:value-of select="($HSPACING  * ($LEFTXFACTOR - $FRAMEPADDING)) + 90"/></xsl:variable>
           <xsl:element name="rect">
-            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * ($LEFTXFACTOR - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
-            <xsl:attribute name="width"><xsl:value-of select="$HSPACING * (@right - @left + (2 * $FRAMEPADDING))"/></xsl:attribute>
+            <xsl:attribute name="width"><xsl:value-of select="$HSPACING * ($RIGHTXFACTOR - $LEFTXFACTOR + (2 * $FRAMEPADDING))"/></xsl:attribute>
             <xsl:attribute name="height"><xsl:value-of select="$VSPACING * (@bottom - @top)"/></xsl:attribute>
             <xsl:attribute name="style">fill: none;</xsl:attribute>
           </xsl:element>
           <xsl:element name="use">
             <xsl:attribute name="href">#frame-polygon</xsl:attribute>
             <xsl:attribute name="xlink:href">#frame-polygon</xsl:attribute>
-            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * (@left - $FRAMEPADDING)"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="$HSPACING  * ($LEFTXFACTOR - $FRAMEPADDING)"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @top"/></xsl:attribute>
           </xsl:element>
           <xsl:element name="text">
-            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * (@left - $FRAMEPADDING)) + 10"/></xsl:attribute>
+            <xsl:attribute name="x"><xsl:value-of select="($HSPACING  * ($LEFTXFACTOR - $FRAMEPADDING)) + 10"/></xsl:attribute>
             <xsl:attribute name="y"><xsl:value-of select="($VSPACING * @top) + 5"/></xsl:attribute>
             <xsl:attribute name="style">text-anchor: start;</xsl:attribute>
             <xsl:attribute name="dominant-baseline">hanging</xsl:attribute>
@@ -495,8 +535,8 @@
           </xsl:element>
           <xsl:if test="@type = 'ALT' or @type = 'SEQ' or @type = 'PAR 'or @type = 'STRICT'">
             <xsl:apply-templates select="operand[count(preceding-sibling::operand) &gt; 0]">
-               <xsl:with-param name="X1POS" select="$HSPACING  * (@left - $FRAMEPADDING)"/>
-               <xsl:with-param name="X2POS" select="$HSPACING  * (@right + $FRAMEPADDING)"/>
+               <xsl:with-param name="X1POS" select="$HSPACING  * ($LEFTXFACTOR - $FRAMEPADDING)"/>
+               <xsl:with-param name="X2POS" select="$HSPACING  * ($RIGHTXFACTOR + $FRAMEPADDING)"/>
                <xsl:with-param name="TEXTX" select="$OPTEXTX"/>
             </xsl:apply-templates>
           </xsl:if>
@@ -570,6 +610,33 @@
         <xsl:with-param name="I"><xsl:value-of select="$I - 1"/></xsl:with-param>
       </xsl:call-template>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="sumspacingfactor">
+    <xsl:param name="N"/>
+    <xsl:param name="RUNNINGTOTAL"/>
+    <xsl:variable name="SPACINGFACTOR">
+      <xsl:choose>
+        <xsl:when test="/sequencediagml/lifelinelist/lifeline[position() = $N]/@spacingfactor">
+          <xsl:value-of select="/sequencediagml/lifelinelist/lifeline[position() = $N]/@spacingfactor"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$N &gt; 2">
+        <xsl:call-template name="sumspacingfactor">
+          <xsl:with-param name="N"><xsl:value-of select="$N - 1"/></xsl:with-param>
+          <xsl:with-param name="RUNNINGTOTAL"><xsl:value-of select="$RUNNINGTOTAL + $SPACINGFACTOR"/></xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$N = 2">
+        <xsl:value-of select="$RUNNINGTOTAL + $SPACINGFACTOR"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="0"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
