@@ -30,6 +30,19 @@
   <xsl:variable name="ACTIVITYBARWIDTH" select="20"/>
   <xsl:variable name="FONTSIZE" select="/sequencediagml/parameters/fontsize/text()"/>
   <xsl:variable name="FONTSTRING" select="concat('font-size: ', $FONTSIZE, 'pt; font-family: Arial, Helvetica, sans-serif;')"/>
+  <xsl:variable name="OBJECTFILL">
+      <xsl:choose>
+        <xsl:when test="count(/sequencediagml/parameters/objectfill)"><xsl:value-of select="/sequencediagml/parameters/objectfill/text()"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="'white'"/></xsl:otherwise>
+      </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="BARFILL">
+      <xsl:choose>
+        <xsl:when test="count(/sequencediagml/parameters/activitybarfill)"><xsl:value-of select="/sequencediagml/parameters/activitybarfill/text()"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="'white'"/></xsl:otherwise>
+      </xsl:choose>
+  </xsl:variable>
+
   <xsl:template match="/">
     <xsl:element name="svg">
       <xsl:attribute name="width"><xsl:value-of select="$SVGWIDTH * $SCALEFACTOR"/></xsl:attribute>
@@ -43,7 +56,7 @@
           <line x1="0" y1="0" x2="10" y2="3.5"/>
           <line x1="0" y1="7" x2="10" y2="3.5"/>
         </marker>
-        <symbol id="object-rect" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="object-rect" viewBox="-200 0 400 100">
           <xsl:element name="rect">
             <xsl:attribute name="x"><xsl:value-of select="$HSPACING * -0.4"/></xsl:attribute>
             <xsl:attribute name="y">5</xsl:attribute>
@@ -51,7 +64,7 @@
             <xsl:attribute name="height">90</xsl:attribute>
           </xsl:element>
         </symbol>
-        <symbol id="active-object-rect" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="active-object-rect" viewBox="-200 0 400 100">
           <use href="#object-rect" xlink:href="#object-rect" width="400" height="100" x="-200" y="0"/>
           <xsl:element name="line">
             <xsl:attribute name="x1"><xsl:value-of select="($HSPACING * -0.4) + 10"/></xsl:attribute>
@@ -69,23 +82,23 @@
         <symbol id="frame-polygon" style="fill: white;">
           <polygon points="0,0 80,0 80,15 70,30 0,30"/>
         </symbol>
-        <symbol id="actor" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="actor" viewBox="-200 0 400 100">
           <circle cx="0" cy="20" r="10"/>
           <line x1="0" y1="30" x2="0" y2="55"/>
           <line x1="-15" y1="35" x2="15" y2="35"/>
           <line x1="0" y1="55" x2="-15" y2="75"/>
           <line x1="0" y1="55" x2="15" y2="75"/>
         </symbol>
-        <symbol id="boundary" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="boundary" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="-35" y1="40" x2="-60" y2="40"/>
           <line x1="-60" y1="5" x2="-60" y2="75"/>
         </symbol>
-        <symbol id="entity" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="entity" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="-35" y1="75" x2="35" y2="75"/>
         </symbol>
-        <symbol id="control" style="fill: none;" viewBox="-200 0 400 100">
+        <symbol id="control" viewBox="-200 0 400 100">
           <circle cx="0" cy="40" r="35"/>
           <line x1="0" y1="5" x2="5" y2="0"/>
           <line x1="0" y1="5" x2="5" y2="10"/>
@@ -224,6 +237,7 @@
         <xsl:attribute name="y"><xsl:value-of select="$OBJECTY"/></xsl:attribute>
         <xsl:attribute name="width">400</xsl:attribute>
         <xsl:attribute name="height">100</xsl:attribute>
+        <xsl:attribute name="fill"><xsl:value-of select="$OBJECTFILL"/></xsl:attribute>
       </xsl:element>
       <xsl:element name="line">
         <xsl:attribute name="x1"><xsl:value-of select="$HPOS"/></xsl:attribute>
@@ -236,7 +250,7 @@
         <xsl:attribute name="x"><xsl:value-of select="$HPOS"/></xsl:attribute>
         <xsl:attribute name="y"><xsl:value-of select="$TEXTPOSITION"/></xsl:attribute>
         <xsl:attribute name="style">text-anchor: middle; stroke-width: 1;</xsl:attribute>
-        <xsl:attribute name="filter">url(#textbg)</xsl:attribute>
+        <!--<xsl:attribute name="filter">url(#textbg)</xsl:attribute>-->
         <xsl:choose>
           <xsl:when test="contains(lifelinename/text(),'&#10;')">
             <xsl:value-of select="substring-before(lifelinename/text(), '&#10;')"/>
@@ -257,7 +271,7 @@
           <xsl:attribute name="y"><xsl:value-of select="$VSPACING * @begin_t"/></xsl:attribute>
           <xsl:attribute name="width"><xsl:value-of select="$ACTIVITYBARWIDTH"/></xsl:attribute>
           <xsl:attribute name="height"><xsl:value-of select="$VSPACING * (@end_t - @begin_t)"/></xsl:attribute>
-          <xsl:attribute name="style">fill: white;</xsl:attribute>
+          <xsl:attribute name="fill"><xsl:value-of select="$BARFILL"/></xsl:attribute>
         </xsl:element>
       </xsl:for-each>
       <xsl:if test="@destroy_t &lt; $MAXT">

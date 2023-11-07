@@ -31,6 +31,8 @@ function loadEmptyDocument() {
         <vspacing>20</vspacing>
         <max_t>30</max_t>
         <fontsize>12</fontsize>
+        <objectfill>#FFFFFF</objectfill>
+        <activitybarfill>#FFFFFF</activitybarfill>
     </parameters>
     <lifelinelist/>
     <messagelist/>
@@ -70,8 +72,10 @@ function loadExampleDocument() {
     <parameters>
         <hspacing>240</hspacing>
         <vspacing>26</vspacing>
-        <max_t>20</max_t>
+        <max_t>21</max_t>
         <fontsize>12</fontsize>
+        <objectfill>#E1E1C8</objectfill>
+        <activitybarfill>#C8C8FA</activitybarfill>
     </parameters>
     <lifelinelist>
         <lifeline type="actor">
@@ -1091,10 +1095,16 @@ function populateLayoutDialog() {
     const fontSize = document.getElementById('fontSize');
     const fontSizeValue = document.getElementById('fontSizeValue');
     fontSizeValue.innerText = fontSize.value = theSourceDoc.dom.getElementsByTagName("fontsize")[0].childNodes[0].nodeValue;
+
+    const objectSpan = document.getElementById('objectcolour');
+    objectSpan.innerText = objectSpan.style.backgroundColor = theSourceDoc.dom.getElementsByTagName("objectfill")[0].childNodes[0].nodeValue;
+
+    const activitybarSpan = document.getElementById('activitybarcolour');
+    activitybarSpan.innerText = activitybarSpan.style.backgroundColor = theSourceDoc.dom.getElementsByTagName("activitybarfill")[0].childNodes[0].nodeValue;
 }
 
 function updateHSpacing(event) {
-  const hspacing = theSourceDoc.dom.getElementsByTagName('hspacing')[0]
+  const hspacing = theSourceDoc.dom.getElementsByTagName('hspacing')[0];
   hspacing.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
   document.getElementById('hSpacingValue').innerText = event.target.value;
@@ -1102,7 +1112,7 @@ function updateHSpacing(event) {
 }
 
 function updateVSpacing(event) {
-  const vspacing = theSourceDoc.dom.getElementsByTagName('vspacing')[0]
+  const vspacing = theSourceDoc.dom.getElementsByTagName('vspacing')[0];
   vspacing.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
   document.getElementById('vSpacingValue').innerText = event.target.value;
@@ -1110,7 +1120,7 @@ function updateVSpacing(event) {
 }
 
 function updateMaxT(event) {
-  const max_t = theSourceDoc.dom.getElementsByTagName('max_t')[0]
+  const max_t = theSourceDoc.dom.getElementsByTagName('max_t')[0];
   max_t.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
   document.getElementById('maxTValue').innerText = event.target.value;
@@ -1118,10 +1128,53 @@ function updateMaxT(event) {
 }
 
 function updateFontSize(event) {
-  const fontsize = theSourceDoc.dom.getElementsByTagName('fontsize')[0]
+  const fontsize = theSourceDoc.dom.getElementsByTagName('fontsize')[0];
   fontsize.childNodes[0].nodeValue = event.target.value;
   theSourceDoc.isModified = true;
   document.getElementById('fontSizeValue').innerText = event.target.value;
+  populateUi();
+}
+
+function addSwatch(currentValue, index, arr) {
+  const newSwatch = document.createElement("div");
+  newSwatch.setAttribute('id', this.id + '_' + index);
+  newSwatch.setAttribute('class', 'swatch');
+  newSwatch.style.backgroundColor = currentValue;
+  this.appendChild(newSwatch);
+  newSwatch.addEventListener('click', clickSwatch);
+}
+
+function clickSwatch(event) {
+  let rgb = event.target.style.backgroundColor;
+  let sep = rgb.indexOf(",") > -1 ? "," : " ";
+  // Turn "rgb(r,g,b)" into [r,g,b]
+  rgb = rgb.substr(4).split(")")[0].split(sep);
+
+  let r = (+rgb[0]).toString(16),
+      g = (+rgb[1]).toString(16),
+      b = (+rgb[2]).toString(16);
+
+  if (r.length == 1)
+    r = "0" + r;
+  if (g.length == 1)
+    g = "0" + g;
+  if (b.length == 1)
+    b = "0" + b;
+  //console.log(event.target.parentNode.id);
+  if (event.target.parentNode.id == 'objectdiv') {
+    updateFill("#" + r + g + b, 'object');
+  }
+  else if (event.target.parentNode.id == 'bardiv') {
+    updateFill("#" + r + g + b, 'activitybar');
+  }
+}
+
+function updateFill(fillcolour, thing) {
+  const thingfill = theSourceDoc.dom.getElementsByTagName(thing + 'fill')[0];
+  thingfill.childNodes[0].nodeValue = fillcolour;
+  theSourceDoc.isModified = true;
+  const thingSpan = document.getElementById(thing + 'colour');
+  thingSpan.innerText = thingSpan.style.backgroundColor = fillcolour;
   populateUi();
 }
 
@@ -1253,6 +1306,13 @@ document.onreadystatechange = () => {
     okFDialog.addEventListener('click', okFrame);
     const deleteFDialog = document.getElementById('deleteFrameDialogBtn');
     deleteFDialog.addEventListener('click', deleteFrame);
+
+    // nice pastel shades
+    const swatchArray = ['#FFFFFF', '#E1E1E1', '#FAC8C8', '#E1E1C8', '#C8FAC8', '#C8E1E1', '#C8C8FA', '#E1C8E1'];
+    const objectDiv = document.getElementById('objectdiv');
+    swatchArray.forEach(addSwatch, objectDiv);
+    const barDiv = document.getElementById('bardiv');
+    swatchArray.forEach(addSwatch, barDiv);
 
     window.addEventListener("beforeunload", check4Changes);
   }

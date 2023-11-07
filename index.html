@@ -265,12 +265,12 @@
     <p>
       <label for="hSpacing">Lifeline Spacing:</label>
       <input id="hSpacing" type="range" min="200" max="300" step="10"/>
-      <span id="hSpacingValue"></span>
+      <span id="hSpacingValue"></span>px
     </p>
     <p>
       <label for="vSpacing">Message Spacing:</label>
       <input id="vSpacing" type="range" min="20" max="30" step="2"/>
-      <span id="vSpacingValue"></span>
+      <span id="vSpacingValue"></span>px
     </p>
     <p>
       <label for="maxT">Max. t:</label>
@@ -280,7 +280,17 @@
     <p>
       <label for="fontSize">Font Size:</label>
       <input id="fontSize" type="range" min="8" max="16" step="2"/>
-      <span id="fontSizeValue"></span>
+      <span id="fontSizeValue"></span>pt
+    </p>
+    <p>
+      <div class="palettedivrow">
+      <span id="objectcolourlabel" class="colourlabel">Object Fill:</span><div id="objectdiv" class="palettediv"></div>&nbsp;<span id="objectcolour"/>
+      </div>
+    </p>
+    <p>
+      <div class="palettedivrow">
+      <span id="barcolourlabel" class="colourlabel">Bar Fill:</span><div id="bardiv" class="palettediv"></div>&nbsp;<span id="activitybarcolour"/>
+      </div>
     </p>
     <menu>
       <button id="hideLayoutDialogBtn" value="cancel">Quit</button>

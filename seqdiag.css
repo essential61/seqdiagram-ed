@@ -147,21 +147,25 @@ option {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 100px;
   border: 1px solid black;
   visibility: hidden;
 }
 #layoutDialog.dialog {
+  width:450px;
+  top: 100px;
   right: 20px;
 }
 #lifelineDialog.dialog {
+  top: 20px;
   right: 100px;
 }
 #messageDialog.dialog {
+  top: 180px;
   right: 180px;
 }
 #frameDialog.dialog {
   width:450px;
+  top: 360px;
   right: 360px;
 }
 
@@ -196,3 +200,25 @@ table {
   width: 3ch;
 }
 
+.palettedivrow {
+ display: flex;
+  align-items: center;
+}
+
+.colourlabel {
+  display: inline-block;
+  width: 130px;
+  text-align: right;
+}
+
+.palettediv {
+ border: 1px solid #AAAAAA;
+ display: flex;
+ height: 30px;
+ width: 170px;
+ align-items: stretch;
+}
+
+.swatch {
+ flex: 1;
+}
