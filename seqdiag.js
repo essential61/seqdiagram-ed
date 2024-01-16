@@ -445,17 +445,15 @@ function populateActivityBars(barData) {
     barList[i].remove();
   }
   const actBarTableBody =  document.getElementById('activityBarsRows');
-  if (barData.length) {
-    document.getElementById('existingActBars').style.display = 'inline-block';
+
+  //if (barData.length) {
     for (i = 0; i < barData.length; i++) {
       const barRowId = 'barRow_' + i;
       const delBtnId = 'delBtnRow_' + i;;
       actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
       document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
     }
-  } else {
-    document.getElementById('existingActBars').style.display = 'none';
-  }
+  //}
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
 }
