@@ -445,15 +445,12 @@ function populateActivityBars(barData) {
     barList[i].remove();
   }
   const actBarTableBody =  document.getElementById('activityBarsRows');
-
-  //if (barData.length) {
-    for (i = 0; i < barData.length; i++) {
-      const barRowId = 'barRow_' + i;
-      const delBtnId = 'delBtnRow_' + i;;
-      actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
-      document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
-    }
-  //}
+  for (i = 0; i < barData.length; i++) {
+    const barRowId = 'barRow_' + i;
+    const delBtnId = 'delBtnRow_' + i;;
+    actBarTableBody.insertAdjacentHTML('beforeend', '<tr id="' + barRowId +'" class="barRow"><td>' + barData[i].getAttribute('begin_t') + '</td><td>' + barData[i].getAttribute('end_t') + '</td><td><button id ="'+ delBtnId + '" class="delBar" value="' + i + '">-&nbsp;</button></td></tr>');
+    document.getElementById(delBtnId).addEventListener("click", removeActivityBar, false);
+  }
   document.getElementById('bbar').value = '';
   document.getElementById('ebar').value = '';
 }
@@ -645,17 +642,13 @@ function populateExtraOperands(operandData) {
     operandList[i].remove();
   }
   const operandTableBody =  document.getElementById('operandRows');
-  if (operandData.length  > 1) {
-    document.getElementById('operands').style.display = 'inline-block';
-    // N.B we ignore 1st operand in loop below
-    for (i = 1; i < operandData.length; i++) {
-      const operandRowId = 'operand_' + i;
-      const delOpBtnId = 'delOpBtnRow_' + i;;
-      operandTableBody.insertAdjacentHTML('beforeend', '<tr id="' + operandRowId +'" class="operandRow"><td>' + operandData[i].getAttribute('t') + '</td><td>' + operandData[i].textContent + '</td><td><button id ="'+ delOpBtnId + '" class="delOperand" value="' + i + '">-&nbsp;</button></td></tr>');
-      document.getElementById(delOpBtnId).addEventListener("click", removeOperand, false);
-    }
-  } else {
-    document.getElementById('operands').style.display = 'none';
+
+  // N.B we ignore 1st operand in loop below
+  for (i = 1; i < operandData.length; i++) {
+    const operandRowId = 'operand_' + i;
+    const delOpBtnId = 'delOpBtnRow_' + i;;
+    operandTableBody.insertAdjacentHTML('beforeend', '<tr id="' + operandRowId +'" class="operandRow"><td>' + operandData[i].getAttribute('t') + '</td><td>' + operandData[i].textContent + '</td><td><button id ="'+ delOpBtnId + '" class="delOperand" value="' + i + '">-&nbsp;</button></td></tr>');
+    document.getElementById(delOpBtnId).addEventListener("click", removeOperand, false);
   }
   document.getElementById('newOperandT').value = '';
   document.getElementById('newOperandText').value = '';
