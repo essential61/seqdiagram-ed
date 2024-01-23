@@ -1,27 +1,36 @@
 body, html {
   height: 100%;
   margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .top-menu {
   display: flex;
   width: 100%;
-  height: auto;
+  overflow: hidden;
+}
+.top-left {
   background-color: #4CBF50;
+  height: auto;
+  overflow: hidden;
 }
 .top-middle {
   flex: 1;
   color: white;
-  padding: 10px 25px;
-  font-family: Arial, Helvetica, sans-serif;
+  /*padding: 10px 25px; */
+
   text-align: center;
   text-decoration: none;
   font-size: 16px;
   background-color: #78c878;
+  overflow: hidden;
 }
 
 .top-right {
+  display: flex;
   margin-left: auto;
+  background-color: #4CBF50;
+  overflow: hidden;
 }
 
 .top-button {
@@ -30,7 +39,6 @@ body, html {
   border-left: 1px solid green;
   color: white;
   padding: 10px 25px;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -49,6 +57,51 @@ body, html {
 #save_svg.top-button {
   border-right: 1px solid green;
 }
+#load_examples {
+  background-color: #4CBF50; /* Green */
+  border: none;
+  border-left: 1px solid green;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  font-size: 16px;
+  cursor: pointer;
+}
+#load_examples:hover {
+  background-color: #3e8e41;
+}
+.dropdown {
+  border: none;
+  overflow: hidden;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #aaaaaa;
+}
 
 .main-flex {
   display: flex;
@@ -56,25 +109,23 @@ body, html {
 }
 .edit-menu {
   width: 120px;
-  background-color: #888888;
+  background-color: #aaaaaa;
   display: block;
 }
 .scale {
   color: white;
   display: flex;
   flex-direction: column;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
 }
 
 .menu-button {
   min-width: 120px;
   background-color: #555555;
-  border: 1px solid #888888;
+  border: 1px solid #aaaaaa;
   color: white;
   padding: 10px 10px;
   display: block;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
@@ -85,11 +136,10 @@ body, html {
 }
 details summary {
   background-color: #555555;
-  border: 1px solid #888888;
+  border: 1px solid #aaaaaa;
   cursor: pointer;
   color: white;
   padding: 10px 10px;
-  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   font-size: 16px;
 }
@@ -102,7 +152,6 @@ details summary > * {
 }
 
 .edit-menu label {
-  font-family: Arial, Helvetica, sans-serif;
   color: white;
   width: 50%;
   border: none;
@@ -112,14 +161,14 @@ details summary > * {
   width: 6ch;
 }
 .edit-menu select {
-  background-color: #888888;
+  background-color: #aaaaaa;
   color: white;
   width: 100%;
   border: none;
   outline: none;
 }
 option {
-  background-color: #888888;
+  background-color: #aaaaaa;
   color: white;
 }
 
@@ -140,7 +189,6 @@ option {
 .dialogContent {
   background-color: #fff;
   padding: 8px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 .dialog {
   width:360px;

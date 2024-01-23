@@ -65,86 +65,13 @@ function loadFileDocument() {
     reader.readAsText(file);
 }
 
-function loadExampleDocument() {
+function loadExampleDocument(event) {
     // a fixed hard-coded example doc
-    const theExampleTxt = `<?xml version="1.0" encoding="UTF-8"?>
-<sequencediagml>
-    <parameters>
-        <hspacing>240</hspacing>
-        <vspacing>26</vspacing>
-        <max_t>21</max_t>
-        <fontsize>12</fontsize>
-        <objectfill>#E1E1C8</objectfill>
-        <activitybarfill>#C8C8FA</activitybarfill>
-    </parameters>
-    <lifelinelist>
-        <lifeline type="actor">
-            <lifelinename>random guy</lifelinename>
-            <activitybars>
-                <activitybar begin_t="1" end_t="20"/>
-            </activitybars>
-        </lifeline>
-        <lifeline type="object">
-            <lifelinename>an object</lifelinename>
-            <activitybars>
-                <activitybar begin_t="1" end_t="20"/>
-            </activitybars>
-        </lifeline>
-        <lifeline type="object">
-            <lifelinename>another object</lifelinename>
-            <activitybars>
-                <activitybar begin_t="12" end_t="13"/>
-            </activitybars>
-        </lifeline>
-        <lifeline type="object" destroy_t="18">
-            <lifelinename>an ephemeral object</lifelinename>
-            <activitybars>
-                <activitybar begin_t="8" end_t="12"/>
-                <activitybar begin_t="16" end_t="17"/>
-            </activitybars>
-        </lifeline>
-        <lifeline type="object">
-            <lifelinename>yet another object</lifelinename>
-            <activitybars>
-                <activitybar begin_t="1" end_t="20"/>
-            </activitybars>
-        </lifeline>
-    </lifelinelist>
-    <messagelist>
-        <message type="asynchronous" from="0" to="1" t="2">
-            <messagetext>begin</messagetext>
-        </message>
-        <message type="create" from="1" to="3" t="3">
-            <messagetext>create object</messagetext>
-        </message>
-        <message type="reflexive" from="1" t="7">
-            <messagetext>reflexive message</messagetext>
-        </message>
-        <message type="synchronous" from="4" to="3" t="8">
-            <messagetext>synchronous message</messagetext>
-            <response t="12">response</response>
-        </message>
-        <message type="asynchronous" from="1" to="2" t="12">
-            <messagetext>asynchronous message</messagetext>
-        </message>
-        <message type="asynchronous" from="1" to="3" t="16">
-            <messagetext>destroy object</messagetext>
-        </message>
-    </messagelist>
-    <framelist>
-        <frame type="SD" widthfactor="1">
-            <operand>Example Diagram</operand>
-        </frame>
-        <frame type="ALT" left="1" right="2" top="5" bottom="14">
-            <operand t="5">[condition x]</operand>
-            <operand t="10">[else]</operand>
-        </frame>
-    </framelist>
-</sequencediagml>`;
+    const theExampleTxt = examples[event.target.id];
     const parser = new DOMParser();
     theSourceDoc.dom = parser.parseFromString(theExampleTxt, "application/xml");
     theSourceDoc.isModified = false;
-    theSourceDoc.fileName = 'example.uml';
+    theSourceDoc.fileName = event.target.id + '.uml';
     closeDialogs();
     populateUi();
 }
@@ -1176,18 +1103,27 @@ function check4Changes (event) {
   }
 }
 
+function populateExampleList() {
+  const exampleBody =  document.getElementById('example-list');
+  Object.keys(examples).forEach(key => {
+    exampleBody.insertAdjacentHTML('beforeend', '<a href="javascript:;" id="' + key + '">' + key + '</a>');
+    document.getElementById(key).addEventListener("click", loadExampleDocument, false);
+});
+}
+
 // Add handlers
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
     // Top Menu
     const inputElement = document.getElementById("load_local");
     inputElement.addEventListener("change", loadFileDocument, false);
-    const exampleElement = document.getElementById("load_example");
-    exampleElement.addEventListener("click", loadExampleDocument, false);
     const saveUmlElement = document.getElementById("save_uml");
     saveUmlElement.addEventListener("click", saveUmlDocument, false);
     const saveSvgElement = document.getElementById("save_svg");
     saveSvgElement.addEventListener("click", saveSvgDocument, false);
+
+    populateExampleList();
+
     document.addEventListener('mouseup', stopDragging);
 
     const scaling = document.getElementById('scaling');

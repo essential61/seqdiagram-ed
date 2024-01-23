@@ -5,12 +5,13 @@
     <link rel="shortcut icon" href="#">
     <link rel="stylesheet" href="seqdiag.css">
     <script src="seqdiag.js"></script>
+    <script src="examples.js"></script>
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <meta charset="UTF-8">
   </head>
   <body>
-    <div class="top-menu">
+    <nav class="top-menu">
       <div class="top-left">
         <button id="load_file" class="top-button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
         <button id="save_uml" class="top-button">Save File</button>
@@ -19,13 +20,18 @@
       <div class="top-middle">
         <span id="file_banner">untitled.uml</span>
       </div>
+
       <div class="top-right">
-        <button id="load_example" class="top-button">Load Example</button>
-        <button id="help" class="top-button" onclick=" window.open('./help/help.html', '_blank')">Help</button>
+        <div class="dropdown">
+          <button id="load_examples">Examples</button>
+          <div id="example-list" class="dropdown-content">
+          </div>
+        </div>
+        <button id="help" class="top-button" onclick="window.open('./help/help.html', '_blank')">Help</button>
         <!-- Place this tag where you want the button to render. -->
         <span style="background-color: #333333; display: inline-block; height: 100%;"><a class="github-button" href="https://github.com/essential61/seqdiagram-ed" data-color-scheme="no-preference: dark_high_contrast; light: dark_high_contrast; dark: dark_high_contrast;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star essential61/seqdiagram-ed on GitHub">Star</a></span>
       </div>
-    </div>
+    </nav>
 
     <div class="main-flex">
       <div class="edit-menu" id="edit-menu">
@@ -269,7 +275,7 @@
     </p>
     <p>
       <label for="vSpacing">Message Spacing:</label>
-      <input id="vSpacing" type="range" min="20" max="30" step="2"/>
+      <input id="vSpacing" type="range" min="20" max="40" step="2"/>
       <span id="vSpacingValue"></span>px
     </p>
     <p>
