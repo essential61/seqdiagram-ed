@@ -536,6 +536,10 @@ function resetFrameDialog() {
 
   document.getElementById('newOperandT').value = '';
   document.getElementById('newOperandText').value = '';
+  const operandList = document.querySelectorAll('.operandRow');
+  for (i = 0; i < operandList.length; i++) {
+    operandList[i].remove();
+  }
   document.getElementById('sd-div').style.display = 'none';
   document.getElementById('non-sd-div').style.display = 'none';
   document.getElementById('operands').style.display = 'none';

@@ -568,7 +568,7 @@
       <xsl:attribute name="y1"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
       <xsl:attribute name="x2"><xsl:value-of select="$X2POS"/></xsl:attribute>
       <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
-      <xsl:attribute name="style">fill: none; stroke-width: 2; stroke-dasharray: 5 5;</xsl:attribute>
+      <xsl:attribute name="style">fill: none; stroke-width: 2; stroke-dasharray: 10 5;</xsl:attribute>
     </xsl:element>
     <xsl:element name="text">
       <xsl:attribute name="x"><xsl:value-of select="$TEXTX"/></xsl:attribute>

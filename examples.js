@@ -332,5 +332,119 @@ Services</lifelinename>
         </message>
     </messagelist>
     <framelist/>
+</sequencediagml>`,
+  //CDN
+  CDN: `<?xml version="1.0" encoding="UTF-8"?>
+<sequencediagml>
+  <parameters>
+    <hspacing>300</hspacing>
+    <vspacing>36</vspacing>
+    <max_t>54</max_t>
+    <fontsize>12</fontsize>
+    <objectfill>#e1c8e1</objectfill>
+    <activitybarfill>#c8fac8</activitybarfill>
+  </parameters>
+  <lifelinelist>
+    <lifeline type="object">
+      <lifelinename>Client</lifelinename>
+      <activitybars>
+        <activitybar begin_t="3" end_t="8"/>
+        <activitybar begin_t="14" end_t="17"/>
+        <activitybar begin_t="22" end_t="25"/>
+        <activitybar begin_t="33" end_t="36"/>
+      </activitybars>
+    </lifeline>
+    <lifeline type="object">
+      <lifelinename>CDN</lifelinename>
+      <activitybars>
+        <activitybar begin_t="3" end_t="10"/>
+        <activitybar begin_t="14" end_t="17"/>
+        <activitybar begin_t="22" end_t="29"/>
+        <activitybar begin_t="33" end_t="50"/>
+      </activitybars>
+    </lifeline>
+    <lifeline type="object">
+      <lifelinename>Origin</lifelinename>
+      <activitybars>
+        <activitybar begin_t="6" end_t="7"/>
+        <activitybar begin_t="26" end_t="27"/>
+        <activitybar begin_t="39" end_t="40"/>
+        <activitybar begin_t="44" end_t="45"/>
+      </activitybars>
+    </lifeline>
+  </lifelinelist>
+  <messagelist>
+    <message type="synchronous" from="0" to="1" t="3">
+      <messagetext>request content</messagetext>
+      <response t="8">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="4">
+      <messagetext>cache MISS</messagetext>
+    </message>
+    <message type="synchronous" from="1" to="2" t="6">
+      <messagetext>request content</messagetext>
+      <response t="7">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="9">
+      <messagetext>store content, set age timestamp</messagetext>
+    </message>
+    <message type="synchronous" from="0" to="1" t="14">
+      <messagetext>request content</messagetext>
+      <response t="17">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="15">
+      <messagetext>cache HIT</messagetext>
+    </message>
+    <message type="synchronous" from="0" to="1" t="22">
+      <messagetext>request content</messagetext>
+      <response t="25">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="23">
+      <messagetext>cache Stale/Expired</messagetext>
+    </message>
+    <message type="synchronous" from="1" to="2" t="26">
+      <messagetext>request content</messagetext>
+      <response t="27">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="28">
+      <messagetext>store content, reset age timestamp</messagetext>
+    </message>
+    <message type="synchronous" from="0" to="1" t="33">
+      <messagetext>request content</messagetext>
+      <response t="36">200 OK + content</response>
+    </message>
+    <message type="reflexive" from="1" t="34">
+      <messagetext>cache Stale/Expired</messagetext>
+    </message>
+    <message type="synchronous" from="1" to="2" t="39">
+      <messagetext>conditionally request content</messagetext>
+      <response t="40">304 not modified</response>
+    </message>
+    <message type="synchronous" from="1" to="2" t="44">
+      <messagetext>conditionally request content</messagetext>
+      <response t="45">200 OK + updated content</response>
+    </message>
+    <message type="reflexive" from="1" t="46">
+      <messagetext>store updated content</messagetext>
+    </message>
+    <message type="reflexive" from="1" t="49">
+      <messagetext>reset age timestamp</messagetext>
+    </message>
+  </messagelist>
+  <framelist>
+    <frame type="SD" widthfactor="1">
+      <operand t="">CDN Principles of Operation</operand>
+    </frame>
+    <frame type="ALT" left="0" right="2" top="1" bottom="52">
+      <operand t="1">Cache Miss</operand>
+      <operand t="12">Cache Hit</operand>
+      <operand t="20">Asynchronous Content Re-validation (allow serve stale content)</operand>
+      <operand t="31">Conditional Re-validation (e.g. using  'If-None-Match' or 'If-Modified-Since' headers)</operand>
+    </frame>
+    <frame type="ALT" left="1" right="2" top="37" bottom="48" narrow="true">
+      <operand t="37">cached content matches origin version</operand>
+      <operand t="42">updated content</operand>
+    </frame>
+  </framelist>
 </sequencediagml>`
 };
