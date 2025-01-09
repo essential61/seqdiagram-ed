@@ -23,8 +23,8 @@
 <h3> Export SVG </h3>
 <p> To export the diagram as a .svg image, click 'Export SVG' to open a dialog box and type the name to be given to the saved file. The file will be saved in your browser's download directory. </p>
 
-<h3> Examples </h3>
-<p> Click on 'Examples' to show a dropdown menu for various examples. These examples show how to create some of the constructs you may wish to render on your sequence diagram. When creating your own sequence diagram you can either start from scratch or you may find it more convenient to alter one of the example files. </p>
+<h3> Load Example </h3>
+<p> Click 'Load Example' to open an example .uml file. This example shows how to create some of the constructs you may wish to render on your sequence diagram. When creating your own sequence diagram you can either start from scratch or you may find it more convenient to alter the example file. </p>
 
 <h3> Help </h3>
 <p> Click 'Help' to view this manual. </p>
@@ -32,31 +32,27 @@
 
 
 <h2> Diagram Editor Toolbar</h2>
-<p> The diagram editor toolbar is located on the left-side of the screen. Alternatively exising items can be edited by clicking on them. A selected item will be highlighted in blue.</p>
+<p> The diagram editor toolbar is located on the left-side of the screen. Alternatively exising items can be edited by clicking on them. A selected item will be highlighted in blue. </p>
 
 <h3> Scale </h3>
 <p> The scale bar can be adjusted between 30-200% to zoom in or out.</p>
 
 <h3> time-axis </h3>
-<p> Display of the (vertical) temporal-axis can be toggled on or off by clicking 'show t Axis; or 'hide t Axis'as desired. </p>
-<p> No units are specified for the temporal-axis, but the passage of time is in a downward direction. e.g. a message at t=3 occurs after a message at t=2 and will be positioned lower down on the diagram.</p>
-<p> The t Axis does not appear in saved SVG files.</p>
+<p> Display of the temporal axis can be toggled on or off by clicking 'show t Axis; or 'hide t Axis'as desired. The t Axis does not appear in saved SVG files.</p>
 
 <h3> Appearance and Geometry </h3>
 <p> Click on 'Appearance and Geometry' to bring up a menu to adjust the general diagram parameters. </p>
 <p> Lifeline Spacing: Scale the spacing between lifelines and the width of the lifeline name box between 200-300 px.</p>
-<p> Message Spacing: Scale the t-axis between 20-40 px. </p>
-<p> Max t: Set the number of time increments shown on Sequence Diagram. </p>
+<p> Message Spacing: Scale the t-axis between 20-30 px. </p>
+<p> Max t: Set the number of time increments shown on Sequence Diagram. No units are specified for the time increments, but the passage of time is in a downward direction. e.g. a message at t=3 occurs after a message at t=2 and will be positioned lower down on the diagram.</p>
 <p> Font Size: Set the font size between 8-16 pt. </p>
-<p> Object fill: Set the colour of objects by clicking on the colour you wish to set as the fill colour. </p>
-<p> Bar fill: Set the colour of activity bars by clicking on the colour you wish to set as the fill colour. </p>
 
 <h3> Lifelines </h3>
-<p> Click on 'Lifelines' to expand the lifeline section, and click 'new lifeline' to create a new lifeline, or click on an existing lifeline to edit or delete the lifeline. New lifelines are added to the RHS of the diagram. Edit existing lifelines (change name, and if necessary type) if the "new" lifeline is not intended to be position right-most.</p>
+<p> Click on 'Lifelines' to expand the lifeline section, and click 'new lifeline' to create a new lifeline, or click on an existing lifeline to edit or delete the lifeline. New lifelines are added to the RHS of the diagram.</p>
 <p> Brings up a Dialog containing the following fields: </p>
 <p> Lifeline Type: Select the lifeline type. The symbol on the diagram changes accordingly. </p>
 <p> Lifeline Name: Enter the name of the lifeline.</p>
-<p> Activity Bars: Enter the start and end t value of an activity bar. Clicking 'apply' will add the activity bar to the diagram, and will allow additional activity bars to be added. To remove an existing activity bar click on the "minus" button at the the right-hand side of the entry and click 'apply'.</p>
+<p> Activity Bars: Enter the start and end time of an activity bar. Clicking 'apply' will add the activity bar to the diagram, and will allow additional activity bars to be added.</p>
 <p> Finite lifeline?: Check the 'Finite lifeline?' tickbox to add a finite end time to the lifeline.</p>
 
 
@@ -68,19 +64,19 @@
 <p> To: Select message destination from a list of existing lifelines.</p>
 <p> Message Text: Add text describing the message.</p>
 <p> Message t: Enter the time the message occurs.</p>
+<p> Transit t: If there is a transit time for the message to propagate from the sender to the receiver enter the value here.</p>
 <p> Show response: Tickbox available if 'Synchronous' message type selected. Display the 'Response Text' and 'Response t' fields.</p>
 
 
 <h3> Frames </h3>
 <p> Click on 'Frames' to expand the frame section, and click 'new frame' to create a new frame, or click on an existing frame to edit or delete the frame.</p>
 <p> Brings up a Dialog containing the following fields.</p>
-<p> Frame Type: Select the frame type. </p>
-<p> Frame Text: Enter text describing the frame.</p>
-<p> left: Select the leftmost lifeline the frame encompasses. </p>
-<p> right: Select the rightmost lifeline the frame encompasses. </p>
-<p> Top t:</p>
-<p> Bottom t:</p> 
-<p> Select narrow to make the frame narrower than standard. e.g. if you wish to nest a break frame inside a loop frame.</p>
+<p>Frame Type: Select the frame type. </p>
+<p>Frame Text: Enter text describing the frame.</p>
+<p>left: Select the leftmost lifeline the frame encompasses. </p>
+<p>right: Select the rightmost lifeline the frame encompasses. </p>
+<p>Top t:</p>
+<p>Bottom t:</p> 
 <p> Label width: Available if the (SD) frame type is selected. The width of the label corresponds to the (no. of lifelines) it encompases. </p>
 <p> Extra Operands: Available if the (ALT, PAR, SEQ, STRICT) frame type selected. Enter a value for t to add a divider line and add operand text.</p>
 
