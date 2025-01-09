@@ -273,7 +273,7 @@ function saveSvgDocument() {
       if (svgFilename) {
         const xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xslSVG);
-        xsltProcessor.setParameter(null, 'BOUNDINGRECTS', 'no');
+        xsltProcessor.setParameter(null, 'BROWSERRENDER', 'no');
         const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
         const s = new XMLSerializer();
         const contentSvg = s.serializeToString(theSvgDoc);
@@ -417,6 +417,7 @@ function showMessageDialog(messageIndex) {
   hideMessageDialog();
   const maxT = getMaxT();
   document.getElementById('tValue').setAttribute('max', maxT);
+  document.getElementById('delayValue').value = '0';
   document.getElementById('rtValue').setAttribute('max', maxT);
   document.getElementById('showSyncResponse').style.display = "none";
   document.getElementById('syncResponse').style.display = "none";
@@ -461,6 +462,9 @@ function populateMessageDialog(messageIdx) {
   }
   document.getElementById('messageText').value = messageData.getElementsByTagName('messagetext')[0].textContent;
   document.getElementById('tValue').value = messageData.getAttribute('t');
+  if (messageData.getAttribute('t_delay') != null) {
+    document.getElementById('delayValue').value = messageData.getAttribute('t_delay');
+  }
   if (messageData.getElementsByTagName('response').length) {
     document.getElementById('showResponse').checked = true;
     document.getElementById('syncResponse').style.display = "inline-block";
@@ -830,6 +834,7 @@ function updateMessage() {
   const typeAttr = document.getElementById('messageType').value;
   const fromAttr = document.getElementById('fromLifeline').value;
   const tAttr = document.getElementById('tValue').value;
+  const delayAttr = document.getElementById('delayValue').value;
   newElement.setAttribute('type',typeAttr);
   newElement.setAttribute('from',fromAttr);
   if (!(typeAttr == 'reflexive')) {
@@ -837,6 +842,7 @@ function updateMessage() {
     newElement.setAttribute('to',toAttr);
   }
   newElement.setAttribute('t',tAttr);
+  newElement.setAttribute('t_delay',delayAttr);
   let newMessageText = xmlDoc.createElement('messagetext');
   const messageText = document.getElementById('messageText').value;
   const newMessageTextTextNode = xmlDoc.createTextNode(messageText);
@@ -1189,6 +1195,8 @@ document.onreadystatechange = () => {
     messageText.addEventListener('change', enableApplyMessageDialog);
     const messageT = document.getElementById('tValue');
     messageT.addEventListener('input', tValueInput);
+    const delayT = document.getElementById('delayValue');
+    delayT.addEventListener('change', enableApplyMessageDialog);
     const messageResponse = document.getElementById('responseText');
     messageResponse.addEventListener('change', enableApplyMessageDialog);
     const rtValue = document.getElementById('rtValue');

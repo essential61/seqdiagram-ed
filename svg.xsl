@@ -3,7 +3,7 @@
   <xsl:param  name="SHOWSCALE" select="''"/>
   <xsl:param  name="SCALEFACTOR" select="1"/>
   <!-- invisible bounding rects to make it easier to click on lines -->
-  <xsl:param  name="BOUNDINGRECTS" select="'yes'"/>
+  <xsl:param  name="BROWSERRENDER" select="'yes'"/>
   <!-- space between lifelines -->
   <xsl:variable name="HSPACING" select="/sequencediagml/parameters/hspacing/text()"/>
   <!-- space between increments of t -->
@@ -301,6 +301,14 @@
         <xsl:with-param name="RUNNINGTOTAL">0</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="T_DELAY">
+      <xsl:choose>
+        <xsl:when test="@t_delay">
+          <xsl:value-of select="@t_delay"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="MESSAGEOFFSET">
       <xsl:choose>
         <xsl:when test="@to > @from">
@@ -384,7 +392,7 @@
             <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
             <xsl:attribute name="y1"><xsl:value-of select="(@t * $VSPACING)"/></xsl:attribute>
             <xsl:attribute name="x2"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
-            <xsl:attribute name="y2"><xsl:value-of select="@t * $VSPACING"/></xsl:attribute>
+            <xsl:attribute name="y2"><xsl:value-of select="(@t + $T_DELAY) * $VSPACING"/></xsl:attribute>
             <xsl:if test="@type = 'create'">
               <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
             </xsl:if>
@@ -408,12 +416,20 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:element>
-          <xsl:if test="$BOUNDINGRECTS = 'yes'">
-            <xsl:element name="rect">
+          <xsl:if test="$BROWSERRENDER = 'yes'">
+            <!-- <xsl:element name="rect">
               <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
               <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 3.5"/></xsl:attribute>
               <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
               <xsl:attribute name="height">7</xsl:attribute>
+              <xsl:attribute name="visibility">hidden</xsl:attribute>
+            </xsl:element> -->
+            <xsl:element name="line">
+              <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
+              <xsl:attribute name="y1"><xsl:value-of select="(@t * $VSPACING)"/></xsl:attribute>
+              <xsl:attribute name="x2"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
+              <xsl:attribute name="y2"><xsl:value-of select="(@t + $T_DELAY) * $VSPACING"/></xsl:attribute>
+              <xsl:attribute name="stroke-width">10</xsl:attribute>
               <xsl:attribute name="visibility">hidden</xsl:attribute>
             </xsl:element>
           </xsl:if>
@@ -423,7 +439,7 @@
               <xsl:attribute name="x1"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSET"/></xsl:attribute>
               <xsl:attribute name="y1"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
               <xsl:attribute name="x2"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
-              <xsl:attribute name="y2"><xsl:value-of select="response/@t * $VSPACING"/></xsl:attribute>
+              <xsl:attribute name="y2"><xsl:value-of select="(response/@t + $T_DELAY) * $VSPACING"/></xsl:attribute>
               <xsl:attribute name="style">stroke-dasharray: 5 5;</xsl:attribute>
               <xsl:attribute name="marker-end"><xsl:value-of select="$ARROWTYPE"/></xsl:attribute>
             </xsl:element>
@@ -445,12 +461,20 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:element>
-            <xsl:if test="$BOUNDINGRECTS = 'yes'">
-              <xsl:element name="rect">
+            <xsl:if test="$BROWSERRENDER = 'yes'">
+              <!--<xsl:element name="rect">
                 <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
                 <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 3.5"/></xsl:attribute>
                 <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
-                <xsl:attribute name="height">7</xsl:attribute>
+                <xsl:attribute name="height">10</xsl:attribute>
+                <xsl:attribute name="visibility">hidden</xsl:attribute>
+              </xsl:element> -->
+              <xsl:element name="line">
+                <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
+                <xsl:attribute name="y1"><xsl:value-of select="(response/@t * $VSPACING)"/></xsl:attribute>
+                <xsl:attribute name="x2"><xsl:value-of select="($TOXFACTOR * $HSPACING) - $MESSAGEOFFSETTO"/></xsl:attribute>
+                <xsl:attribute name="y2"><xsl:value-of select="(response/@t + $T_DELAY) * $VSPACING"/></xsl:attribute>
+                <xsl:attribute name="stroke-width">10</xsl:attribute>
                 <xsl:attribute name="visibility">hidden</xsl:attribute>
               </xsl:element>
             </xsl:if>

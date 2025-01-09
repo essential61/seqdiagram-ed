@@ -446,5 +446,64 @@ Services</lifelinename>
       <operand t="42">updated content</operand>
     </frame>
   </framelist>
+</sequencediagml>`,
+// TCP Transmission Example
+  TCP: `<?xml version="1.0" encoding="UTF-8"?>
+<sequencediagml>
+  <parameters>
+    <hspacing>300</hspacing>
+    <vspacing>20</vspacing>
+    <max_t>33</max_t>
+    <fontsize>12</fontsize>
+    <objectfill>#c8fac8</objectfill>
+    <activitybarfill>#FFFFFF</activitybarfill>
+  </parameters>
+  <lifelinelist>
+    <lifeline type="object">
+      <lifelinename>Client</lifelinename>
+      <activitybars/>
+    </lifeline>
+    <lifeline type="object">
+      <lifelinename>Server</lifelinename>
+      <activitybars/>
+    </lifeline>
+  </lifelinelist>
+  <messagelist>
+    <message type="asynchronous" from="0" to="1" t="1" t_delay="1">
+      <messagetext>SYN i</messagetext>
+    </message>
+    <message type="asynchronous" from="1" to="0" t="4" t_delay="1">
+      <messagetext>SYN j, ACK i+1</messagetext>
+    </message>
+    <message type="asynchronous" from="0" to="1" t="7" t_delay="1">
+      <messagetext>ACK j+1</messagetext>
+    </message>
+    <message type="asynchronous" from="0" to="1" t="13" t_delay="1">
+      <messagetext>SEQ=a, ACK=b, DATA</messagetext>
+    </message>
+    <message type="asynchronous" from="1" to="0" t="16" t_delay="1">
+      <messagetext>SEQ=b, ACK=a+len(DATA)</messagetext>
+    </message>
+    <message type="asynchronous" from="0" to="1" t="22" t_delay="1">
+      <messagetext>FIN, SEQ=m, ACK=n</messagetext>
+    </message>
+    <message type="asynchronous" from="1" to="0" t="25" t_delay="1">
+      <messagetext>ACK=m+1</messagetext>
+    </message>
+    <message type="asynchronous" from="1" to="0" t="27" t_delay="1">
+      <messagetext>FIN, SEQ=n, ACK=m+1</messagetext>
+    </message>
+    <message type="asynchronous" from="0" to="1" t="30" t_delay="1">
+      <messagetext>ACK=n+1</messagetext>
+    </message>
+  </messagelist>
+  <framelist>
+    <frame type="LOOP" left="0" right="1" top="10" bottom="19">
+      <operand t="10">While(DATA)</operand>
+    </frame>
+    <frame type="SD" widthfactor="1">
+      <operand t="">TCP Data Transmission</operand>
+    </frame>
+  </framelist>
 </sequencediagml>`
 };
