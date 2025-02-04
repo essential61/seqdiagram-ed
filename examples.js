@@ -386,7 +386,7 @@ Services</lifelinename>
       <response t="7">200 OK + content</response>
     </message>
     <message type="reflexive" from="1" t="9">
-      <messagetext>store content, set age timestamp</messagetext>
+      <messagetext>store content, set expiry timestamp</messagetext>
     </message>
     <message type="synchronous" from="0" to="1" t="14">
       <messagetext>request content</messagetext>
@@ -407,7 +407,7 @@ Services</lifelinename>
       <response t="27">200 OK + content</response>
     </message>
     <message type="reflexive" from="1" t="28">
-      <messagetext>store content, reset age timestamp</messagetext>
+      <messagetext>store content, reset expiry timestamp</messagetext>
     </message>
     <message type="synchronous" from="0" to="1" t="33">
       <messagetext>request content</messagetext>
@@ -428,7 +428,7 @@ Services</lifelinename>
       <messagetext>store updated content</messagetext>
     </message>
     <message type="reflexive" from="1" t="49">
-      <messagetext>reset age timestamp</messagetext>
+      <messagetext>reset expiry timestamp</messagetext>
     </message>
   </messagelist>
   <framelist>
@@ -505,5 +505,16 @@ Services</lifelinename>
       <operand t="">TCP Data Transmission</operand>
     </frame>
   </framelist>
-</sequencediagml>`
+</sequencediagml>`,
+  //DNS
+  DNS: `<?xml version="1.0" encoding="UTF-8"?><sequencediagml><parameters><hspacing>300</hspacing><vspacing>26</vspacing><max_t>30</max_t><fontsize>12</fontsize><objectfill>#fac8c8</objectfill><activitybarfill>#c8c8fa</activitybarfill></parameters><lifelinelist><lifeline type="actor"><lifelinename>user</lifelinename><activitybars/></lifeline><lifeline type="object"><lifelinename>DNS
+Client</lifelinename><activitybars><activitybar begin_t="2" end_t="25"/></activitybars></lifeline><lifeline type="object"><lifelinename>DNS
+Resolver</lifelinename><activitybars><activitybar begin_t="6" end_t="24"/></activitybars></lifeline><lifeline type="object"><lifelinename>DNS
+Root Server</lifelinename><activitybars><activitybar begin_t="10" end_t="12"/></activitybars></lifeline><lifeline type="object"><lifelinename>DNS
+TLD Server
+for *.com</lifelinename><activitybars><activitybar begin_t="14" end_t="16"/></activitybars></lifeline><lifeline type="object"><lifelinename>DNS
+Authoritative Server
+for *.example.com</lifelinename><activitybars><activitybar begin_t="18" end_t="20"/></activitybars></lifeline></lifelinelist><messagelist><message type="asynchronous" from="0" to="1" t="2" t_delay="0"><messagetext>user types "www.example.com"</messagetext></message><message type="reflexive" from="1" t="3" t_delay="0"><messagetext>DNS Cache MISS</messagetext></message><message type="synchronous" from="1" to="2" t="6" t_delay="0"><messagetext>What IP does "www.example.com"
+resolve to?</messagetext><response t="22">IP is xx.xx.xx.xx, TTL is n seconds</response></message><message type="reflexive" from="2" t="7" t_delay="0"><messagetext>DNS Cache MISS</messagetext></message><message type="synchronous" from="2" to="3" t="10" t_delay="0"><messagetext>What IP does "www.example.com"
+resolve to?</messagetext><response t="12">Refer to TLD server for *.com</response></message><message type="synchronous" from="2" to="4" t="14" t_delay="0"><messagetext>What IP does "www.example.com" resolve to?</messagetext><response t="16">Refer to Authoritative Server for example.com</response></message><message type="synchronous" from="2" to="5" t="18" t_delay="0"><messagetext>What IP does "www.example.com" resolve to?</messagetext><response t="20">IP is xx.xx.xx.xx, TTL is n seconds</response></message><message type="reflexive" from="2" t="23" t_delay="0"><messagetext>Cache result</messagetext></message><message type="reflexive" from="1" t="24" t_delay="0"><messagetext>Cache result</messagetext></message></messagelist><framelist><frame type="SD" widthfactor="1"><operand t="">DNS Resolution</operand></frame></framelist></sequencediagml>`
 };

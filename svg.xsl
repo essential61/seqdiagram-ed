@@ -417,13 +417,6 @@
             </xsl:choose>
           </xsl:element>
           <xsl:if test="$BROWSERRENDER = 'yes'">
-            <!-- <xsl:element name="rect">
-              <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
-              <xsl:attribute name="y"><xsl:value-of select="(@t * $VSPACING) - 3.5"/></xsl:attribute>
-              <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
-              <xsl:attribute name="height">7</xsl:attribute>
-              <xsl:attribute name="visibility">hidden</xsl:attribute>
-            </xsl:element> -->
             <xsl:element name="line">
               <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
               <xsl:attribute name="y1"><xsl:value-of select="(@t * $VSPACING)"/></xsl:attribute>
@@ -462,13 +455,6 @@
               </xsl:choose>
             </xsl:element>
             <xsl:if test="$BROWSERRENDER = 'yes'">
-              <!--<xsl:element name="rect">
-                <xsl:attribute name="x"><xsl:value-of select="$XBOUNDRECT"/></xsl:attribute>
-                <xsl:attribute name="y"><xsl:value-of select="(response/@t * $VSPACING) - 3.5"/></xsl:attribute>
-                <xsl:attribute name="width"><xsl:value-of select="$WIDTHBOUNDRECT"/></xsl:attribute>
-                <xsl:attribute name="height">10</xsl:attribute>
-                <xsl:attribute name="visibility">hidden</xsl:attribute>
-              </xsl:element> -->
               <xsl:element name="line">
                 <xsl:attribute name="x1"><xsl:value-of select="($FROMXFACTOR * $HSPACING) + $MESSAGEOFFSET"/></xsl:attribute>
                 <xsl:attribute name="y1"><xsl:value-of select="(response/@t * $VSPACING)"/></xsl:attribute>
