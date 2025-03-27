@@ -97,16 +97,13 @@ function tAxisShow(event) {
   populateUi();
 }
 
-function updateScale(event) {
-  document.getElementById('scaleValue').innerText = Math.trunc(event.target.value * 100) + '%';
-  populateUi();
-}
-
 function populateUi() {
+    const scaleFactor = document.getElementById('scaling').value;
+    document.getElementById('scaleValue').innerText = Math.trunc(scaleFactor * 100) + '%';
     // theSourceDoc.dom and xslSVG are application globals
     const xsltProcessor = new XSLTProcessor();
     xsltProcessor.importStylesheet(xslSVG);
-    const scaleFactor = document.getElementById('scaling').value;
+
     xsltProcessor.setParameter(null, 'SCALEFACTOR', scaleFactor);
     if (document.getElementById('toggleScaleButton').textContent == 'Hide t Axis') {
       xsltProcessor.setParameter(null, 'SHOWSCALE', 'yes');
@@ -238,7 +235,7 @@ function populateUi() {
       }
       theFrameList.appendChild(optFrameGroup);
       theFrameList.size = frameNodes.length + 3;
-    }
+    }            //context.scale(scaleFactor, scaleFactor);
 
     const fileBanner = document.getElementById('file_banner');
     fileBanner.innerText = theSourceDoc.fileName;
@@ -258,8 +255,16 @@ function saveUmlDocument() {
         let content = s.serializeToString(theSourceDoc.dom);
         content = content.replace(/>\s*/g, '>');
         content = content.replace(/\s*</g, '<');
-        //console.log(content);
-        saveDocument(content, theSourceDoc.fileName);
+        // Create element with <a> tag
+        const link = document.createElement("a");
+        // Create a blob object with the file content which you want to add to the file
+        const file = new Blob([content], { type: 'text/plain' });
+        link.href = URL.createObjectURL(file);
+        link.download = theSourceDoc.fileName;
+        // Add click event to <a> tag to save file.
+        link.click();
+        URL.revokeObjectURL(link.href);
+
         theSourceDoc.isModified = false;
         const fileBanner = document.getElementById('file_banner');
         fileBanner.innerText = theSourceDoc.fileName;
@@ -267,35 +272,54 @@ function saveUmlDocument() {
     }
 }
 
-function saveSvgDocument() {
+function exportDocument(event) {
     if (theSourceDoc.dom != null) {
-      const svgFilename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName.replace(/\..*/g, '.svg'))
-      if (svgFilename) {
+      const fileType = '.' + event.target.id;
+      const exportFilename = prompt('File will be saved in your browser Download directory.\nFile will be saved as: ', theSourceDoc.fileName.replace(/\..*/g, fileType));
+      if (exportFilename) {
         const xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xslSVG);
         xsltProcessor.setParameter(null, 'BROWSERRENDER', 'no');
         const theSvgDoc = xsltProcessor.transformToDocument(theSourceDoc.dom);
         const s = new XMLSerializer();
         const contentSvg = s.serializeToString(theSvgDoc);
-        saveDocument(contentSvg, svgFilename);
+        const blobSvg = new Blob([contentSvg], { type: 'image/svg+xml' });
+        const svgObjectUrl = URL.createObjectURL(blobSvg);
+        // Create element with <a> tag
+        const link = document.createElement("a");
+        link.download = exportFilename;
+        if(fileType == '.png') {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            console.log(document.getElementById('scaling').value);
+            const scaleFactor = document.getElementById('scaling').value;
+            // Set canvas dimensions (adjust as needed)
+            canvas.width = img.width * scaleFactor;
+            canvas.height = img.height * scaleFactor;
+            context.fillStyle = "white";
+
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            link.href = canvas.toDataURL('image/png');
+            // Add click event to <a> tag to save file.
+            link.click();
+            URL.revokeObjectURL(link.href);
+          };
+          img.onerror = () => {  console.error('Failed to load SVG image'); };
+          img.src = svgObjectUrl;
+        } else {
+          link.href = URL.createObjectURL(blobSvg);
+          // Add click event to <a> tag to save file.
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }
+
       }
     }
 }
 
-function saveDocument(content, fileName2Use) {
-    // Create element with <a> tag
-    const link = document.createElement("a");
-    // Create a blob object with the file content which you want to add to the file
-    const file = new Blob([content], { type: 'text/plain' });
-    // Add file content in the object URL
-    link.href = URL.createObjectURL(file);
-    // Add file name
-    link.download = fileName2Use;
-    // Add click event to <a> tag to save file.
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
-///////////////////////////
 function showLifelineDialogSvg(event) {
   const lifelineIndex = event.target.parentElement.id.split('_')[1];
   showLifelineDialog(lifelineIndex);
@@ -325,7 +349,7 @@ function showLifelineDialog(lifelineIndex) {
 function resetLifelineDialog() {
   document.getElementById('lifelineDialogHeader').textContent = 'New Lifeline';
   document.getElementById('lifelineIdx').value = 'new';
-  document.getElementById('lifelineType').selectedIndex = -1;
+  document.getElementById('lifelineType').selectedIndex = -1;log.
   document.getElementById('lifelineName').value = '';
   const barList = document.querySelectorAll('.barRow');
   for (i = 0; i < barList.length; i++) {
@@ -1129,15 +1153,17 @@ document.onreadystatechange = () => {
     inputElement.addEventListener("change", loadFileDocument, false);
     const saveUmlElement = document.getElementById("save_uml");
     saveUmlElement.addEventListener("click", saveUmlDocument, false);
-    const saveSvgElement = document.getElementById("save_svg");
-    saveSvgElement.addEventListener("click", saveSvgDocument, false);
+    const saveSvgElement = document.getElementById("svg");
+    saveSvgElement.addEventListener("click", exportDocument, false);
+    const savePngElement = document.getElementById("png");
+    savePngElement.addEventListener("click", exportDocument, false);
 
     populateExampleList();
 
     document.addEventListener('mouseup', stopDragging);
 
     const scaling = document.getElementById('scaling');
-    scaling.addEventListener('input', updateScale);
+    scaling.addEventListener('input', populateUi);
 
     const tAxisBtn = document.getElementById('toggleScaleButton');
     tAxisBtn.addEventListener('click', tAxisShow);

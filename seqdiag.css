@@ -10,6 +10,7 @@ body, html {
   overflow: hidden;
 }
 .top-left {
+  display: flex;
   background-color: #4CBF50;
   height: auto;
   overflow: hidden;
@@ -54,8 +55,19 @@ body, html {
   min-width: 120px;
   border-left: none;
 }
-#save_svg.top-button {
+#save_svg {
+  background-color: #4CBF50; /* Green */
+  border: none;
+  border-left: 1px solid green;
   border-right: 1px solid green;
+  display: block;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  font-size: 16px;
+  cursor: pointer;
 }
 #load_examples {
   background-color: #4CBF50; /* Green */

@@ -15,7 +15,13 @@
       <div class="top-left">
         <button id="load_file" class="top-button"><label for="load_local">Load File</label><input id="load_local" style="display: none;" type="file"/></button>
         <button id="save_uml" class="top-button">Save File</button>
-        <button id="save_svg" class="top-button">Export SVG</button>
+        <div class="dropdown">
+          <button id="save_svg">Export</button>
+          <div id="export" class="dropdown-content">
+             <a href="javascript:;" id="svg">as SVG</a>
+             <a href="javascript:;" id="png">as PNG</a>
+          </div>
+        </div>
       </div>
       <div class="top-middle">
         <span id="file_banner">untitled.uml</span>
